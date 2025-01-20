@@ -1,0 +1,35 @@
+{
+  "grammars": [
+    {
+      "name": "verse",
+      "camelcase": "Verse",
+      "scope": "source.verse",
+      "file-types": [
+        ".verse"
+      ],
+      "injection-regex": "^verse$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Verse (Epic Games's new language) grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Unoqwy",
+        "email": "pm@unoqwy.dev"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/Unoqwy/tree-sitter-verse"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true
+  }
+}
