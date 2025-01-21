@@ -34,7 +34,11 @@ module.exports = grammar({
 
   externals: $ => [
     $._auto_terminator,
-    $._body_open,
+    $._open_braced_block,
+    $._open_indent_block,
+    $._close_indent_block,
+    $._indent,
+    $._dedent,
     $._error_sentinel,
   ],
 
@@ -153,12 +157,6 @@ module.exports = grammar({
     ),
     //#endregion
 
-    body: $ => seq( // TODO:
-      $._body_open,
-      repeat($._complete_expr),
-      /\s*[}]/,
-    ),
-
     declaration: $ => prec.left(PREC.decl, seq(
       field('lhs', $._expr),
       choice(
@@ -168,12 +166,53 @@ module.exports = grammar({
       field('rhs', $._expr),
     )),
 
-    //#region Functions
-    macro_call: $ => seq(
+    //#region Blocks
+    macro_call: $ => prec.left(1, seq(
       field('macro', $._stdexpr),
-      $.body,
-    ),
+      alias($.macro_block, $.block),
+    )),
 
+    macro_block: $ => prec.right(choice(
+      seq(
+        $._open_braced_block,
+        repeat($._complete_expr),
+        /\s*[}]/,
+      ),
+      seq(
+        ":",
+        $._open_indent_block,
+        repeat(seq(
+          $._indent,
+          $._complete_expr,
+          $._dedent,
+        )),
+        $._close_indent_block,
+      ),
+    )),
+
+    _inline_body: $ => prec.left(10, choice(
+      $.block,
+      $._expr,
+    )),
+    block: $ => choice(
+      seq(
+        $._open_braced_block,
+        repeat($._complete_expr),
+        /\s*[}]/,
+      ),
+      seq(
+        $._open_indent_block,
+        repeat(seq(
+          $._indent,
+          $._complete_expr,
+          $._dedent,
+        )),
+        prec.right($._close_indent_block),
+      ),
+    ),
+    //#endregion
+
+    //#region Functions
     function_call: $ => {
       const inner = optional(field('arguments', $.argument_list));
       return seq(
@@ -184,20 +223,14 @@ module.exports = grammar({
         ),
       );
     },
-    argument_list: $ => {
-      const rule = choice(
+    argument_list: $ => separated1(
+      ",",
+      choice(
         $._expr,
         $.named_argument
-      );
-      return seq(
-        rule,
-        repeat(prec.left(1, seq(
-          ",",
-          rule,
-        ))),
-        optional(",")
-      );
-    },
+      ),
+      optional(","),
+    ),
     named_argument: $ => prec.left(PREC.decl, seq(
       '?',
       field('name', $.identifier),
@@ -215,7 +248,7 @@ module.exports = grammar({
       field('ret_type', $._expr),
       optional(seq(
         choice('=', ':='),
-        $.body,
+        $._inline_body,
       )),
     )),
     //#endregion
@@ -284,7 +317,7 @@ module.exports = grammar({
   * @returns {SeqRule}
   */
 function separated1(separator, rule, trail) {
-  const rules = [rule, repeat(seq(separator, rule))];
+  const rules = [rule, repeat(prec.left(1, seq(separator, rule)))];
   if (trail) {
     rules.push(trail);
   }

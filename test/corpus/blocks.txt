@@ -9,7 +9,7 @@ using { /Github.com/Gost }
 (source_file
   (macro_call
     (identifier)
-    (body
+    (block
       (path_literal))))
 
 ===============================
@@ -23,7 +23,7 @@ option{0}
 (source_file
   (macro_call
     (identifier)
-    (body
+    (block
       (integer))))
 
 ===============================
@@ -40,7 +40,7 @@ class (supertype) {}
       function: (identifier)
       arguments: (argument_list
         (identifier)))
-    (body)))
+    (block)))
 
 ===============================
 Macro call parameters
@@ -57,5 +57,151 @@ class (supertype, interface) {}
       arguments: (argument_list
         (identifier)
         (identifier)))
-    (body)))
+    (block)))
+
+===============================
+Basic curly block
+===============================
+
+block {
+  0
+  1; 2
+  3
+}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (integer)
+      (integer)
+      (integer))))
+
+===============================
+Nested curly block
+===============================
+
+block {
+  1
+
+  block {
+    block {
+      2
+    }
+  }
+
+  3
+}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (macro_call
+        macro: (identifier)
+        (block
+          (macro_call
+            macro: (identifier)
+            (block
+              (integer)))))
+      (integer))))
+
+===============================
+Basic indent block
+===============================
+
+block:
+  0
+  1; 2
+  3
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (integer)
+      (integer)
+      (integer))))
+
+===============================
+Basic indent block exit
+===============================
+
+block:
+  0
+  1
+2
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (integer)))
+  (integer))
+
+===============================
+Nested indent block
+===============================
+
+block:
+  1
+
+  block:
+    block:
+      2
+
+  3
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (macro_call
+        macro: (identifier)
+        (block
+          (macro_call
+            macro: (identifier)
+            (block
+              (integer)))))
+      (integer))))
+
+===============================
+Nested indent block exit
+===============================
+
+block:
+  block:
+    block:
+      1
+2
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (macro_call
+        macro: (identifier)
+        (block
+          (macro_call
+            macro: (identifier)
+            (block
+              (integer)))))))
+  (integer))
 

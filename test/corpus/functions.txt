@@ -110,5 +110,52 @@ MyFunc<private>()<transacts><decides>: void ={}
       (identifier)
       (identifier))
     ret_type: (identifier)
-    (body)))
+    (block)))
+
+===============================
+Function declaration without block
+===============================
+
+MyFunc(): int = 10
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    ret_type: (identifier)
+    (integer)))
+
+===============================
+Function declaration with curly block
+===============================
+
+MyFunc(): void ={
+  1
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    ret_type: (identifier)
+    (block
+      (integer))))
+
+===============================
+Function declaration with indent block
+===============================
+
+MyFunc(): void =
+  1
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    ret_type: (identifier)
+    (block
+      (integer))))
 
