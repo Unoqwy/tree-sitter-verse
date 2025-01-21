@@ -1,0 +1,70 @@
+===============================
+Barebones declaration
+===============================
+
+Var:1
+
+---
+
+(source_file
+  (declaration
+    lhs: (identifier)
+    rhs: (integer)))
+
+===============================
+Declaration with type hint
+===============================
+
+Var: int = 0
+
+---
+
+(source_file
+  (declaration
+    lhs: (identifier)
+    type_hint: (identifier)
+    rhs: (integer)))
+
+===============================
+Inferred declaration
+===============================
+
+Var := 0
+
+---
+
+(source_file
+  (declaration
+    lhs: (identifier)
+    rhs: (integer)))
+
+===============================
+Multiline declaration
+===============================
+
+Var :=
+  0
+
+---
+
+(source_file
+  (declaration
+    lhs: (identifier)
+    rhs: (integer)))
+
+===============================
+Block declaration
+===============================
+
+Var := {
+  0
+}
+
+---
+
+(source_file
+  (declaration
+    lhs: (identifier)
+    rhs: (block(
+     (integer)))))
+

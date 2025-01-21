@@ -1,0 +1,150 @@
+===============================
+'*' operator
+===============================
+
+1 * 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'/' operator
+===============================
+
+1 / 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'+' operator
+===============================
+
+1 + 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'-' operator
+===============================
+
+1 - 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'=' operator
+===============================
+
+1 = 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'<>' operator
+===============================
+
+1 <> 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'<' operator
+===============================
+
+1 < 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'>' operator
+===============================
+
+1 > 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+
+===============================
+'<=' operator
+===============================
+
+1 <= 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'>=' operator
+===============================
+
+1 <= 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'and' operator
+===============================
+
+1 and 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'or' operator
+===============================
+
+1 or 1
+

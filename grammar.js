@@ -40,6 +40,7 @@ module.exports = grammar({
     $._indent,
     $._dedent,
     $._incomplete_string,
+    $._best_guess_attr_start,
     $._error_sentinel,
   ],
 
@@ -79,9 +80,12 @@ module.exports = grammar({
     // the official parser deals with ```verse
     // if. (0 < 1 > 0)
     // ``` by reading 0<1> and unknown trailing "0"
-    attributes: $ => prec.right(repeat1(prec.left(PREC.cmp, seq(
-      '<', $._expr, '>',
-    )))),
+    attributes: $ => prec.right(seq(
+      $._best_guess_attr_start,
+      repeat1(prec.left(PREC.cmp, seq(
+        '<', $._expr, '>',
+      ))),
+    )),
 
     comma_separated_group: $ => prec.right(seq(
       $._expr,

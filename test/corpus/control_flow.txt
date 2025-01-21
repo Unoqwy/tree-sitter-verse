@@ -1,0 +1,14 @@
+===============================
+'for' loop iterate
+===============================
+
+Player : Ent
+
+---
+
+(source_file
+  (macro_call
+    (identifier)
+    (block
+      (path_literal))))
+

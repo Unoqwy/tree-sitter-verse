@@ -10,6 +10,7 @@ enum TokenType {
     INDENT,
     DEDENT,
     INCOMPLETE_STRING,
+    BEST_GUESS_ATTR_START,
     ERROR_SENTINEL,
 };
 
@@ -96,87 +97,15 @@ static bool scan_auto_terminator(
     return true;
 }
 
-static bool handle_indent_dedent(
-    Scanner *scanner,
-    TSLexer *lexer,
-    const bool *valid_symbols
-) {
-    lexer->mark_end(lexer);
-
-    uint16_t prev_indent_len;
-    if (scanner->indents.size > 0) {
-        prev_indent_len = *array_back(&scanner->indents);
-    } else {
-        prev_indent_len = 0;
-    }
-
-    if (valid_symbols[INDENT] && !valid_symbols[DEDENT]) {
-        int indent_len = 0;
-        for (;;) {
-            if (lexer->lookahead == ' ') {
-                indent_len += 1;
-                lexer->advance(lexer, true);
-            } else if (lexer->lookahead == '\n') {
-                if (valid_symbols[AUTO_TERMINATOR]) {
-                    lexer->mark_end(lexer);
-                    return scan_auto_terminator(lexer, true);
-                }
-                indent_len = 0;
-                lexer->advance(lexer, true);
-            } else if (indent_len == 0) {
-                if (valid_symbols[AUTO_TERMINATOR]) {
-                    return scan_auto_terminator(lexer, false);
-                }
-                if (valid_symbols[CLOSE_INDENT_BLOCK]) {
-                    scanner->indent_block_close += 1;
-                    lexer->result_symbol = CLOSE_INDENT_BLOCK;
-                    return true;
-                }
-                return false;
-            } else {
-                break;
-            }
-        }
-
-        if (indent_len <= prev_indent_len) {
-            if (valid_symbols[CLOSE_INDENT_BLOCK]) {
-                scanner->indent_block_close += 1;
-                lexer->result_symbol = CLOSE_INDENT_BLOCK;
-                return true;
-            }
-            return false;
-        }
-
-        lexer->mark_end(lexer);
-        array_push(&scanner->indents, indent_len);
-        lexer->result_symbol = INDENT;
-        return true;
-    } else if (prev_indent_len > 0) {
-        array_pop(&scanner->indents);
-        lexer->result_symbol = DEDENT;
-        return true;
-    }
-    return false;
-}
-
 bool tree_sitter_verse_external_scanner_scan(
     void *payload,
     TSLexer *lexer,
     const bool *valid_symbols
 ) {
     Scanner *scanner = (Scanner *)payload;
-    if (valid_symbols[INDENT] || valid_symbols[DEDENT]) {
-        return handle_indent_dedent(scanner, lexer, valid_symbols);
-    }
+    bool error_recovery = valid_symbols[ERROR_SENTINEL];
 
-    if (valid_symbols[AUTO_TERMINATOR] && scanner->indent_block_close > 0) {
-        scanner->indent_block_close -= 1;
-        lexer->mark_end(lexer);
-        lexer->result_symbol = AUTO_TERMINATOR;
-        return true;
-    }
-
-    if (valid_symbols[INCOMPLETE_STRING] && !valid_symbols[ERROR_SENTINEL]) {
+    if (valid_symbols[INCOMPLETE_STRING] && !error_recovery) {
         lexer->mark_end(lexer);
         for (;;) {
             if (lexer->lookahead == ' ') {
@@ -191,26 +120,81 @@ bool tree_sitter_verse_external_scanner_scan(
         lexer->result_symbol = INCOMPLETE_STRING;
         return true;
     }
+    if (valid_symbols[AUTO_TERMINATOR]
+            && scanner->indent_block_close > 0
+            && !valid_symbols[INDENT]
+            && !valid_symbols[DEDENT]
+    ) {
+        scanner->indent_block_close -= 1;
+        lexer->result_symbol = AUTO_TERMINATOR;
+        return true;
+    }
+
+    lexer->mark_end(lexer);
+
+    uint16_t prev_indent_len;
+    if (scanner->indents.size > 0) {
+        prev_indent_len = *array_back(&scanner->indents);
+    } else {
+        prev_indent_len = 0;
+    }
+    if (valid_symbols[DEDENT] && !error_recovery && prev_indent_len > 0) {
+        array_pop(&scanner->indents);
+        lexer->result_symbol = DEDENT;
+        return true;
+    }
 
     bool met_newline = false;
+    bool compat_with_terminator = true;
+    int indent_len = 0;
+    bool check_other_lines = valid_symbols[OPEN_BRACED_BLOCK] || valid_symbols[INDENT];
     for (;;) {
         if (lexer->lookahead == ' ') {
+            indent_len += 1;
             lexer->advance(lexer, true);
         } else if (lexer->lookahead == '\n') {
+            indent_len = 0;
             lexer->advance(lexer, true);
-            if (!met_newline) {
-                met_newline = true;
+            if (met_newline) {
+                continue;
+            }
+            met_newline = true;
+
+            if (valid_symbols[INDENT]
+                    && valid_symbols[AUTO_TERMINATOR]
+                    && !error_recovery) {
                 lexer->mark_end(lexer);
-                if (valid_symbols[OPEN_INDENT_BLOCK]) {
-                    lexer->result_symbol = OPEN_INDENT_BLOCK;
-                    return true;
-                }
-                if (!valid_symbols[OPEN_BRACED_BLOCK]) {
-                    break;
-                }
+                lexer->result_symbol = AUTO_TERMINATOR;
+                return scan_auto_terminator(lexer, true);
+            } else if (valid_symbols[INDENT]
+                    && valid_symbols[CLOSE_INDENT_BLOCK]
+                    && !error_recovery) {
+                compat_with_terminator = false;
+            } else {
+                lexer->mark_end(lexer);
+            }
+            if (valid_symbols[OPEN_INDENT_BLOCK] && !error_recovery) {
+                lexer->result_symbol = OPEN_INDENT_BLOCK;
+                return true;
+            }
+            if (!check_other_lines) {
+                break;
             }
         } else {
             break;
+        }
+    }
+
+    if (valid_symbols[INDENT] && !error_recovery) {
+        if (indent_len > prev_indent_len) {
+            array_push(&scanner->indents, indent_len);
+            lexer->mark_end(lexer);
+            lexer->result_symbol = INDENT;
+            return true;
+        } else if (valid_symbols[CLOSE_INDENT_BLOCK]) {
+            scanner->indent_block_close += 1;
+            lexer->result_symbol = CLOSE_INDENT_BLOCK;
+            return true;
         }
     }
 
@@ -220,9 +204,41 @@ bool tree_sitter_verse_external_scanner_scan(
         lexer->result_symbol = OPEN_BRACED_BLOCK;
         return true;
     } else if (valid_symbols[AUTO_TERMINATOR]
-            && scan_auto_terminator(lexer, met_newline)) {
+            && compat_with_terminator
+            && scan_auto_terminator(lexer, met_newline)
+            && !error_recovery) {
         lexer->result_symbol = AUTO_TERMINATOR;
         return true;
+    }
+
+    if (valid_symbols[BEST_GUESS_ATTR_START] && lexer->lookahead == '<') {
+        // FIXME : find a proper way to avoid this hack
+        lexer->mark_end(lexer);
+        lexer->result_symbol = BEST_GUESS_ATTR_START;
+
+        size_t cursor = 0;
+        for (;;) {
+            lexer->advance(lexer, false);
+            cursor += 1;
+            switch (lexer->lookahead) {
+                case ' ':
+                    break;
+                case '\n':
+                case ')':
+                case ']':
+                case '}':
+                    return false;
+                case '>':
+                    if (cursor == 1) {
+                        return false;
+                    }
+                    return true;
+                case '(':
+                case '[':
+                case '{':
+                    return true;
+            }
+        }
     }
 
     return false;
