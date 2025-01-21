@@ -37,6 +37,7 @@ module.exports = grammar({
 
   conflicts: $ => [
     [$.function_call, $.function_declaration],
+    [$.macro_call, $.argument_list],
   ],
 
   rules: {
@@ -143,11 +144,7 @@ module.exports = grammar({
     declaration: $ => prec.left(PREC.decl, seq(
       field('lhs', $.expr),
       choice(
-        seq(
-          ':',
-          field('type_hint', $.expr),
-          '='
-        ),
+        seq(':', field('type_hint', $.expr), '='),
         ':='
       ),
       field('rhs', $.expr),
@@ -158,33 +155,46 @@ module.exports = grammar({
       field('macro', $._stdexpr),
       optional(seq(
         '(',
-        ANYLINE_WHITESPACE,
+        //ANYLINE_WHITESPACE,
         field('param', $.expr),
-        ANYLINE_WHITESPACE,
-        ')',
+        /\s*[)]/,
       )),
       $.body,
     )),
 
     function_call: $ => seq(
-      field('name', $._stdexpr),
+      field('function', $._stdexpr),
       '(',
-      // TODO : parameters
-      ANYLINE_WHITESPACE,
-      ')'
+      optional(field('arguments', $.argument_list)),
+      /\s*[)]/,
     ),
+    argument_list: $ => separated1(
+      ",",
+      choice(
+        $.expr,
+        $.named_argument,
+      ),
+      optional(","),
+    ),
+    named_argument: $ => prec.left(PREC.decl, seq(
+      '?',
+      field('name', $.identifier),
+      ':=',
+      $.expr,
+    )),
 
     function_declaration: $ => seq(
       field('name', $._stdexpr),
       '(',
       // TODO : parameters
-      ANYLINE_WHITESPACE,
-      ')',
+      /\s*[)]/,
       optional(field('effects', $.attributes)),
       ':',
       field('ret_type', $.expr),
-      choice('=', ':='),
-      $.body
+      optional(seq(
+        choice('=', ':='),
+        $.body,
+      )),
     ),
     //#endregion
 
@@ -221,6 +231,7 @@ module.exports = grammar({
         ['not', PREC.not ],
         ['+'  , PREC.sign],
         ['-'  , PREC.sign],
+        ['set', PREC.decl],
       ];
       /** @type [string, number][] */
       const suffix_table = [
@@ -242,4 +253,19 @@ module.exports = grammar({
     //#endregion
   }
 });
+
+/**
+  * Creates a rule for array-like elements with a separator.
+  * @param {RuleOrLiteral} separator
+  * @param {RuleOrLiteral} rule
+  * @param {RuleOrLiteral?} trail
+  * @returns {SeqRule}
+  */
+function separated1(separator, rule, trail) {
+  const rules = [rule, repeat(seq(separator, rule))];
+  if (trail) {
+    rules.push(trail);
+  }
+  return seq(...rules);
+}
 

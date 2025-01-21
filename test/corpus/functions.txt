@@ -1,0 +1,98 @@
+===============================
+Empty function call
+===============================
+
+Clear()
+
+---
+
+(source_file
+  (function_call
+    function: (identifier)))
+
+===============================
+Single argument function call
+===============================
+
+Print(0)
+Print(1,)
+
+---
+
+(source_file
+  (function_call
+    function: (identifier)
+    arguments: (argument_list
+      (integer)))
+  (function_call
+    function: (identifier)
+    arguments: (argument_list
+      (integer))))
+
+===============================
+Several arguments function call
+===============================
+
+Print(0, "Hello, World", 1)
+
+---
+
+(source_file
+  (function_call
+    function: (identifier)
+    arguments: (argument_list
+      (integer)
+      (string
+        (string_fragment))
+      (integer))))
+
+===============================
+Named arguments function call
+===============================
+
+Print(0, ?Debug := true)
+
+---
+
+(source_file
+  (function_call
+    function: (identifier)
+    arguments: (argument_list
+      (integer)
+      (named_argument
+        name: (identifier)
+        (logic_literal)))))
+
+===============================
+Barebones function declaration
+===============================
+
+MyFunc():void
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    ret_type: (identifier)))
+
+
+===============================
+No parameter function declaration
+===============================
+
+MyFunc<private>()<transacts><decides>: void ={}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    name: (attributes
+      (identifier))
+    effects: (attributes
+      (identifier)
+      (identifier))
+    ret_type: (identifier)
+    (body)))
+

@@ -1,0 +1,63 @@
+===============================
+Single level parenthesized
+===============================
+
+(1)
+
+---
+
+(source_file
+  (integer))
+
+===============================
+Nested level parenthesized
+===============================
+
+(((2)))
+
+---
+
+(source_file
+  (integer))
+
+===============================
+Parenthesized single attribute
+===============================
+
+(1<attr>)
+
+(1)<attr>
+
+---
+
+(source_file
+  (integer)
+  (attributes
+    (identifier))
+
+  (integer)
+  (attributes
+    (identifier)))
+
+===============================
+Parenthesized several attributes
+===============================
+
+(1<fst>)<snd>
+
+(1)<fst><snd>
+
+---
+
+(source_file
+  (integer)
+  (attributes
+    (identifier))
+  (attributes
+    (identifier))
+
+  (integer)
+  (attributes
+    (identifier)
+    (identifier)))
+
