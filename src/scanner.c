@@ -72,7 +72,9 @@ static bool scan_auto_terminator(
     TSLexer *lexer,
     bool met_newline
 ) {
-    if (!met_newline) {
+    if (lexer->eof(lexer)) {
+        lexer->mark_end(lexer);
+    } else if (!met_newline) {
         switch (lexer->lookahead) {
             case 0:
             case ')':
