@@ -39,6 +39,7 @@ module.exports = grammar({
     $._close_indent_block,
     $._indent,
     $._dedent,
+    $._incomplete_string,
     $._error_sentinel,
   ],
 
@@ -147,7 +148,7 @@ module.exports = grammar({
         $.string_fragment,
         $.string_template,
       )),
-      choice('"', '\n'),
+      choice('"', $._incomplete_string),
     ),
     string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "\\{"))),
     string_template: $ => seq(
@@ -207,7 +208,7 @@ module.exports = grammar({
           $._complete_expr,
           $._dedent,
         )),
-        prec.right($._close_indent_block),
+        $._close_indent_block,
       ),
     ),
     //#endregion

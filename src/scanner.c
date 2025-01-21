@@ -9,6 +9,7 @@ enum TokenType {
     CLOSE_INDENT_BLOCK,
     INDENT,
     DEDENT,
+    INCOMPLETE_STRING,
     ERROR_SENTINEL,
 };
 
@@ -172,6 +173,22 @@ bool tree_sitter_verse_external_scanner_scan(
         scanner->indent_block_close -= 1;
         lexer->mark_end(lexer);
         lexer->result_symbol = AUTO_TERMINATOR;
+        return true;
+    }
+
+    if (valid_symbols[INCOMPLETE_STRING] && !valid_symbols[ERROR_SENTINEL]) {
+        lexer->mark_end(lexer);
+        for (;;) {
+            if (lexer->lookahead == ' ') {
+                lexer->advance(lexer, true);
+                continue;
+            } else if (lexer->lookahead == '\n') {
+                break;
+            } else {
+                return false;
+            }
+        }
+        lexer->result_symbol = INCOMPLETE_STRING;
         return true;
     }
 

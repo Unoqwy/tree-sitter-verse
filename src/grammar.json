@@ -404,8 +404,8 @@
               "value": "\""
             },
             {
-              "type": "STRING",
-              "value": "\n"
+              "type": "SYMBOL",
+              "name": "_incomplete_string"
             }
           ]
         }
@@ -663,12 +663,8 @@
               }
             },
             {
-              "type": "PREC_RIGHT",
-              "value": 0,
-              "content": {
-                "type": "SYMBOL",
-                "name": "_close_indent_block"
-              }
+              "type": "SYMBOL",
+              "name": "_close_indent_block"
             }
           ]
         }
@@ -1515,6 +1511,10 @@
     {
       "type": "SYMBOL",
       "name": "_dedent"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_incomplete_string"
     },
     {
       "type": "SYMBOL",
