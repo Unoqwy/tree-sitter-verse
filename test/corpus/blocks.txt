@@ -1,0 +1,61 @@
+===============================
+'using' macro
+===============================
+
+using { /Github.com/Gost }
+
+---
+
+(source_file
+  (macro_call
+    (identifier)
+    (body
+      (path_literal))))
+
+===============================
+'option' macro
+===============================
+
+option{0}
+
+---
+
+(source_file
+  (macro_call
+    (identifier)
+    (body
+      (integer))))
+
+===============================
+Macro call parameter
+===============================
+
+class (supertype) {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (function_call
+      function: (identifier)
+      arguments: (argument_list
+        (identifier)))
+    (body)))
+
+===============================
+Macro call parameters
+===============================
+
+class (supertype, interface) {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (function_call
+      function: (identifier)
+      arguments: (argument_list
+        (identifier)
+        (identifier)))
+    (body)))
+

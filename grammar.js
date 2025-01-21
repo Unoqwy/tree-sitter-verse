@@ -32,20 +32,29 @@ const PREC = {
 module.exports = grammar({
   name: "verse",
 
-  extras: _ => [INLINE_WHITESPACE],
-  inline: $ => [$.expr],
+  externals: $ => [
+    $._auto_terminator,
+    $._body_open,
+    $._error_sentinel,
+  ],
+
+  // TODO : figure out if strict newline handling is needed
+  // extras: _ => [INLINE_WHITESPACE],
 
   conflicts: $ => [
     [$.function_call, $.function_declaration],
-    [$.macro_call, $.argument_list],
   ],
 
   rules: {
-    source_file: $ => repeat($._expression_line),
-    _expression_line: $ => seq(ANYLINE_WHITESPACE, $.expr, choice(';', '\n')), // FIXME:
+    source_file: $ => repeat($._complete_expr),
+
+    _complete_expr: $ => seq(
+      $._expr,
+      choice(';', $._auto_terminator)
+    ),
 
     //#region Expression Kinds
-    expr: $ => choice(
+    _expr: $ => choice(
       $._stdexpr,
       $._non_attributable_expr,
     ),
@@ -54,10 +63,10 @@ module.exports = grammar({
     // (((class_name))<internal>):=((class)<(final)>(){})
     // ```
     // so, among other considerations, parenthesized expressions
-    // are transparent to keep workable trees
+    // are kept transparent to keep workable trees
     _stdexpr: $ => prec.right(seq(
       choice(
-        seq('(', ANYLINE_WHITESPACE, $.expr, /\s*[)]/),
+        seq('(', ANYLINE_WHITESPACE, $._expr, /\s*[)]/),
         $._standalone_expr,
       ),
       optional($.attributes),
@@ -66,10 +75,17 @@ module.exports = grammar({
     // if. (0 < 1 > 0)
     // ``` by reading 0<1> and unknown trailing "0"
     attributes: $ => prec.right(repeat1(prec.left(PREC.cmp, seq(
-      '<',
-      $.expr,
-      '>',
+      '<', $._expr, '>',
     )))),
+
+    comma_separated_group: $ => prec.right(seq(
+      $._expr,
+      repeat1(prec.left(seq(
+        ",",
+        $._expr,
+      ))),
+      optional(",")
+    )),
 
     _standalone_expr: $ => choice(
       $.identifier,
@@ -88,6 +104,8 @@ module.exports = grammar({
 
       $.unary_expression,
       $.binary_expression,
+
+      $.comma_separated_group,
     ),
     //#endregion
 
@@ -100,7 +118,7 @@ module.exports = grammar({
       /0x[0-9A-Fa-f]+/,
       seq(
         /[0-9]+/,
-        optional(field('suffix', $._number_suffix)),
+        optional($.number_suffix),
       ),
     ),
     float: $ => {
@@ -112,10 +130,10 @@ module.exports = grammar({
           seq(digits, '.', digits, optional(exponent)),
           seq(digits, exponent),
         )),
-        optional(field('suffix', $._number_suffix)),
+        optional($.number_suffix),
       );
     },
-    _number_suffix: _ => token.immediate(/[A-Za-z_][A-Za-z0-9_]*/),
+    number_suffix: _ => token.immediate(/[A-Za-z_][A-Za-z0-9_]*/),
     //#endregion
 
     //#region Strings
@@ -125,77 +143,81 @@ module.exports = grammar({
         $.string_fragment,
         $.string_template,
       )),
-      '"',
+      choice('"', '\n'),
     ),
     string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "\\{"))),
     string_template: $ => seq(
       /[{]\s*/,
-      $.expr,
+      $._expr,
       /\s*[}]/,
     ),
     //#endregion
 
     body: $ => seq( // TODO:
-      /\s*[{]\s*/,
-      optional($.expr),
+      $._body_open,
+      repeat($._complete_expr),
       /\s*[}]/,
     ),
 
     declaration: $ => prec.left(PREC.decl, seq(
-      field('lhs', $.expr),
+      field('lhs', $._expr),
       choice(
-        seq(':', field('type_hint', $.expr), '='),
+        seq(':', field('type_hint', $._expr), '='),
         ':='
       ),
-      field('rhs', $.expr),
+      field('rhs', $._expr),
     )),
 
     //#region Functions
-    macro_call: $ => prec.left(0, seq(
+    macro_call: $ => seq(
       field('macro', $._stdexpr),
-      optional(seq(
-        '(',
-        //ANYLINE_WHITESPACE,
-        field('param', $.expr),
-        /\s*[)]/,
-      )),
       $.body,
-    )),
+    ),
 
-    function_call: $ => seq(
-      field('function', $._stdexpr),
-      '(',
-      optional(field('arguments', $.argument_list)),
-      /\s*[)]/,
-    ),
-    argument_list: $ => separated1(
-      ",",
-      choice(
-        $.expr,
-        $.named_argument,
-      ),
-      optional(","),
-    ),
+    function_call: $ => {
+      const inner = optional(field('arguments', $.argument_list));
+      return seq(
+        field('function', $._stdexpr),
+        choice(
+          seq('(', inner, /\s*[)]/),
+          seq('[', inner, /\s*\]/),
+        ),
+      );
+    },
+    argument_list: $ => {
+      const rule = choice(
+        $._expr,
+        $.named_argument
+      );
+      return seq(
+        rule,
+        repeat(prec.left(1, seq(
+          ",",
+          rule,
+        ))),
+        optional(",")
+      );
+    },
     named_argument: $ => prec.left(PREC.decl, seq(
       '?',
       field('name', $.identifier),
       ':=',
-      $.expr,
+      $._expr,
     )),
 
-    function_declaration: $ => seq(
+    function_declaration: $ => prec.left(seq(
       field('name', $._stdexpr),
       '(',
       // TODO : parameters
       /\s*[)]/,
       optional(field('effects', $.attributes)),
       ':',
-      field('ret_type', $.expr),
+      field('ret_type', $._expr),
       optional(seq(
         choice('=', ':='),
         $.body,
       )),
-    ),
+    )),
     //#endregion
 
     //#region Operators
@@ -217,9 +239,9 @@ module.exports = grammar({
       ];
       return choice(...binary_table.map(
         ([op, pval]) => prec.left(pval, seq(
-          field('left', $.expr),
+          field('left', $._expr),
           field('operator', op),
-          field('right', $.expr) 
+          field('right', $._expr) 
          )),
       ));
     },
@@ -241,11 +263,11 @@ module.exports = grammar({
         prefix_table.map(
           ([op, pval]) => prec.left(pval, seq(
             field('operator', op),
-            field('operand', $.expr),
+            field('operand', $._expr),
            )))
         .concat(suffix_table.map(
           ([op, pval]) => prec.left(pval, seq(
-            field('operand', $.expr),
+            field('operand', $._expr),
             field('operator', op),
            ))))
       );

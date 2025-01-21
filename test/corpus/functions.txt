@@ -3,10 +3,13 @@ Empty function call
 ===============================
 
 Clear()
+Clear[]
 
 ---
 
 (source_file
+  (function_call
+    function: (identifier))
   (function_call
     function: (identifier)))
 
@@ -16,10 +19,15 @@ Single argument function call
 
 Print(0)
 Print(1,)
+Print[2,]
 
 ---
 
 (source_file
+  (function_call
+    function: (identifier)
+    arguments: (argument_list
+      (integer)))
   (function_call
     function: (identifier)
     arguments: (argument_list
@@ -51,10 +59,18 @@ Named arguments function call
 ===============================
 
 Print(0, ?Debug := true)
+Print[1, ?Debug := true]
 
 ---
 
 (source_file
+  (function_call
+    function: (identifier)
+    arguments: (argument_list
+      (integer)
+      (named_argument
+        name: (identifier)
+        (logic_literal))))
   (function_call
     function: (identifier)
     arguments: (argument_list
