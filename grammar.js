@@ -12,16 +12,6 @@ const INLINE_WHITESPACE = /[ ]+/;
 const ANYLINE_WHITESPACE = /\s*/;
 
 /**
-  * Creates a seq rule that allows multiline whitespace.
-  * @param {RuleOrLiteral[]} rules
-  * @return {SeqRule}
-  */
-function anyseq(...rules) {
-  return seq(...rules.flatMap((rule, index, array) =>
-    index < array.length - 1 ? [rule, ANYLINE_WHITESPACE] : [rule]));
-}
-
-/**
   * Precedence table.
   * @type {Object.<string, number>}
   */
@@ -43,6 +33,7 @@ module.exports = grammar({
   name: "verse",
 
   extras: _ => [INLINE_WHITESPACE],
+  inline: $ => [$.expr],
 
   conflicts: $ => [
     [$.function_call, $.function_declaration],
@@ -50,19 +41,36 @@ module.exports = grammar({
 
   rules: {
     source_file: $ => repeat($._expression_line),
-    _expression_line: $ => seq(ANYLINE_WHITESPACE, $._expr, choice(';', '\n')), // FIXME:
+    _expression_line: $ => seq(ANYLINE_WHITESPACE, $.expr, choice(';', '\n')), // FIXME:
 
+    //#region Expression Kinds
+    expr: $ => choice(
+      $._stdexpr,
+      $._non_attributable_expr,
+    ),
     // in Verse, *everything* is an expression
     // you can write mad stuff like ```verse
     // (((class_name))<internal>):=((class)<(final)>(){})
     // ```
     // so, among other considerations, parenthesized expressions
     // are transparent to keep workable trees
-    _expr: $ => prec.right(seq(
-      choice(anyseq('(', $._expr, ')'), $._expr_root),
+    _stdexpr: $ => prec.right(seq(
+      choice(
+        seq('(', ANYLINE_WHITESPACE, $.expr, /\s*[)]/),
+        $._standalone_expr,
+      ),
       optional($.attributes),
     )),
-    _expr_root: $ => choice(
+    // the official parser deals with ```verse
+    // if. (0 < 1 > 0)
+    // ``` by reading 0<1> and unknown trailing "0"
+    attributes: $ => prec.right(repeat1(prec.left(PREC.cmp, seq(
+      '<',
+      $.expr,
+      '>',
+    )))),
+
+    _standalone_expr: $ => choice(
       $.identifier,
       $.path_literal,
       $.logic_literal,
@@ -70,20 +78,17 @@ module.exports = grammar({
       $.float,
       $.string,
 
-      $.declaration,
-
       $.macro_call,
       $.function_call,
+    ),
+    _non_attributable_expr: $ => choice(
+      $.declaration,
       $.function_declaration,
 
       $.unary_expression,
       $.binary_expression,
     ),
-    attributes: $ => prec.right(repeat1(prec.left(PREC.cmp, seq(
-      '<',
-      $._expr,
-      '>',
-    )))),
+    //#endregion
 
     identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
     path_literal: _ => /[/][A-Za-z0-9_][A-Za-z0-9_\-.]*(\/[A-Za-z0-9_][A-Za-z0-9_\-.]*)*/,
@@ -122,39 +127,39 @@ module.exports = grammar({
       '"',
     ),
     string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "\\{"))),
-    string_template: $ => anyseq(
-      "{",
-      $._expr,
-      "}",
+    string_template: $ => seq(
+      /[{]\s*/,
+      $.expr,
+      /\s*[}]/,
     ),
     //#endregion
 
-    body: $ => anyseq( // TODO:
-      '{',
-      $._expr,
-      '}',
+    body: $ => seq( // TODO:
+      /\s*[{]\s*/,
+      optional($.expr),
+      /\s*[}]/,
     ),
 
     declaration: $ => prec.left(PREC.decl, seq(
-      field('lhs', $._expr),
+      field('lhs', $.expr),
       choice(
         seq(
           ':',
-          field('type_hint', $._expr),
+          field('type_hint', $.expr),
           '='
         ),
         ':='
       ),
-      field('rhs', $._expr),
+      field('rhs', $.expr),
     )),
 
     //#region Functions
     macro_call: $ => prec.left(0, seq(
-      field('macro', $._expr),
+      field('macro', $._stdexpr),
       optional(seq(
         '(',
         ANYLINE_WHITESPACE,
-        field('param', $._expr),
+        field('param', $.expr),
         ANYLINE_WHITESPACE,
         ')',
       )),
@@ -162,7 +167,7 @@ module.exports = grammar({
     )),
 
     function_call: $ => seq(
-      field('name', $._expr),
+      field('name', $._stdexpr),
       '(',
       // TODO : parameters
       ANYLINE_WHITESPACE,
@@ -170,14 +175,14 @@ module.exports = grammar({
     ),
 
     function_declaration: $ => seq(
-      field('name', $._expr),
+      field('name', $._stdexpr),
       '(',
       // TODO : parameters
       ANYLINE_WHITESPACE,
       ')',
       optional(field('effects', $.attributes)),
       ':',
-      field('ret_type', $._expr),
+      field('ret_type', $.expr),
       choice('=', ':='),
       $.body
     ),
@@ -202,9 +207,9 @@ module.exports = grammar({
       ];
       return choice(...binary_table.map(
         ([op, pval]) => prec.left(pval, seq(
-          field('left', $._expr),
+          field('left', $.expr),
           field('operator', op),
-          field('right', $._expr) 
+          field('right', $.expr) 
          )),
       ));
     },
@@ -225,11 +230,11 @@ module.exports = grammar({
         prefix_table.map(
           ([op, pval]) => prec.left(pval, seq(
             field('operator', op),
-            field('operand', $._expr),
+            field('operand', $.expr),
            )))
         .concat(suffix_table.map(
           ([op, pval]) => prec.left(pval, seq(
-            field('operand', $._expr),
+            field('operand', $.expr),
             field('operator', op),
            ))))
       );
