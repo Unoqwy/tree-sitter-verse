@@ -62,6 +62,22 @@ Parenthesized several attributes
     (identifier)))
 
 ===============================
+@attribute
+===============================
+
+@attr var: void = 0
+
+---
+
+(source_file
+  (declaration
+    lhs: (at_attributes
+      (identifier))
+    lhs: (identifier)
+    type_hint: (identifier)
+    rhs: (integer)))
+
+===============================
 Comma separated group
 ===============================
 

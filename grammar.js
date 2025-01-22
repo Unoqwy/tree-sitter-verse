@@ -45,6 +45,10 @@ module.exports = grammar({
     $._error_sentinel,
   ],
 
+  conflicts: $ => [
+    [$._stdexpr],
+  ],
+
   rules: {
     source_file: $ => repeat($._complete_expr),
 
@@ -67,6 +71,7 @@ module.exports = grammar({
     // are kept transparent to keep workable trees
     _stdexpr: $ =>
       prec.right(seq(
+        optional($.at_attributes),
         choice(
           seq('(', $._expr, /\s*[)]/),
           $._standalone_expr,
@@ -81,6 +86,12 @@ module.exports = grammar({
         $._best_guess_attr_start,
         repeat1(prec.left(PREC.cmp, seq(
           '<', $._expr, '>',
+        ))),
+      )),
+    at_attributes: $ =>
+      prec.right(seq(
+        repeat1(prec.left(seq(
+          '@', $._expr,
         ))),
       )),
 

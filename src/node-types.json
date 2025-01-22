@@ -8,6 +8,10 @@
       "required": false,
       "types": [
         {
+          "type": "at_attributes",
+          "named": true
+        },
+        {
           "type": "attributes",
           "named": true
         },
@@ -83,6 +87,89 @@
     }
   },
   {
+    "type": "at_attributes",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "at_attributes",
+          "named": true
+        },
+        {
+          "type": "attributes",
+          "named": true
+        },
+        {
+          "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "char",
+          "named": true
+        },
+        {
+          "type": "comma_separated_group",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "fat_arrow_expression",
+          "named": true
+        },
+        {
+          "type": "field_expression",
+          "named": true
+        },
+        {
+          "type": "float",
+          "named": true
+        },
+        {
+          "type": "function_call",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        },
+        {
+          "type": "logic_literal",
+          "named": true
+        },
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "path_literal",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "attributes",
     "named": true,
     "fields": {},
@@ -90,6 +177,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "at_attributes",
+          "named": true
+        },
         {
           "type": "attributes",
           "named": true
@@ -172,6 +263,10 @@
           {
             "type": "(",
             "named": false
+          },
+          {
+            "type": "at_attributes",
+            "named": true
           },
           {
             "type": "attributes",
@@ -306,6 +401,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -386,6 +485,10 @@
       "required": false,
       "types": [
         {
+          "type": "at_attributes",
+          "named": true
+        },
+        {
           "type": "attributes",
           "named": true
         },
@@ -464,6 +567,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "at_attributes",
+          "named": true
+        },
         {
           "type": "attributes",
           "named": true
@@ -548,6 +655,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -624,6 +735,10 @@
           {
             "type": "(",
             "named": false
+          },
+          {
+            "type": "at_attributes",
+            "named": true
           },
           {
             "type": "attributes",
@@ -706,6 +821,10 @@
           {
             "type": "(",
             "named": false
+          },
+          {
+            "type": "at_attributes",
+            "named": true
           },
           {
             "type": "attributes",
@@ -792,6 +911,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -868,6 +991,10 @@
           {
             "type": "(",
             "named": false
+          },
+          {
+            "type": "at_attributes",
+            "named": true
           },
           {
             "type": "attributes",
@@ -958,6 +1085,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -1034,6 +1165,10 @@
           {
             "type": "(",
             "named": false
+          },
+          {
+            "type": "at_attributes",
+            "named": true
           },
           {
             "type": "attributes",
@@ -1145,6 +1280,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -1239,6 +1378,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -1325,6 +1468,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -1407,6 +1554,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -1481,6 +1632,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "at_attributes",
+          "named": true
+        },
         {
           "type": "attributes",
           "named": true
@@ -1614,6 +1769,10 @@
             "named": false
           },
           {
+            "type": "at_attributes",
+            "named": true
+          },
+          {
             "type": "attributes",
             "named": true
           },
@@ -1715,6 +1874,10 @@
       "required": false,
       "types": [
         {
+          "type": "at_attributes",
+          "named": true
+        },
+        {
           "type": "attributes",
           "named": true
         },
@@ -1793,6 +1956,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "at_attributes",
+          "named": true
+        },
         {
           "type": "attributes",
           "named": true
@@ -1873,6 +2040,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "at_attributes",
+          "named": true
+        },
         {
           "type": "attributes",
           "named": true
@@ -1977,6 +2148,10 @@
       "required": false,
       "types": [
         {
+          "type": "at_attributes",
+          "named": true
+        },
+        {
           "type": "attributes",
           "named": true
         },
@@ -2058,6 +2233,10 @@
           {
             "type": "(",
             "named": false
+          },
+          {
+            "type": "at_attributes",
+            "named": true
           },
           {
             "type": "attributes",
@@ -2239,6 +2418,10 @@
   },
   {
     "type": "?",
+    "named": false
+  },
+  {
+    "type": "@",
     "named": false
   },
   {
