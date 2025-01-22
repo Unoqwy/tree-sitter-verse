@@ -6,6 +6,7 @@ enum TokenType {
     AUTO_TERMINATOR,
     OPEN_BRACED_BLOCK,
     OPEN_INDENT_BLOCK,
+    OPEN_INDENT_BLOCK_COLON,
     CLOSE_INDENT_BLOCK,
     INDENT,
     DEDENT,
@@ -160,6 +161,10 @@ bool tree_sitter_verse_external_scanner_scan(
             }
             met_newline = true;
 
+            if (valid_symbols[OPEN_INDENT_BLOCK] && !error_recovery) {
+                lexer->result_symbol = OPEN_INDENT_BLOCK;
+                return true;
+            }
             if (valid_symbols[INDENT]
                     && valid_symbols[AUTO_TERMINATOR]
                     && !error_recovery) {
@@ -173,16 +178,32 @@ bool tree_sitter_verse_external_scanner_scan(
             } else {
                 lexer->mark_end(lexer);
             }
-            if (valid_symbols[OPEN_INDENT_BLOCK] && !error_recovery) {
-                lexer->result_symbol = OPEN_INDENT_BLOCK;
-                return true;
-            }
             if (!check_other_lines) {
                 break;
             }
         } else {
             break;
         }
+    }
+
+    if (valid_symbols[OPEN_INDENT_BLOCK_COLON]
+            && !met_newline
+            && lexer->lookahead == ':') {
+        lexer->advance(lexer, false);
+        for (;;) {
+            if (lexer->lookahead == ' ') {
+                lexer->advance(lexer, true);
+                continue;
+            } else if (lexer->lookahead == '\n') {
+                lexer->advance(lexer, true);
+                lexer->mark_end(lexer);
+                lexer->result_symbol = OPEN_INDENT_BLOCK_COLON;
+                return true;
+            } else {
+                break;
+            }
+        }
+        return false;
     }
 
     if (valid_symbols[INDENT] && !error_recovery) {

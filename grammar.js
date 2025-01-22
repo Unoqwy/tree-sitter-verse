@@ -36,6 +36,7 @@ module.exports = grammar({
     $._auto_terminator,
     $._open_braced_block,
     $._open_indent_block,
+    $._open_indent_block_colon,
     $._close_indent_block,
     $._indent,
     $._dedent,
@@ -219,8 +220,7 @@ module.exports = grammar({
         /\s*[}]/,
       ),
       seq(
-        ":",
-        $._open_indent_block,
+        $._open_indent_block_colon,
         repeat(seq(
           $._indent,
           $._complete_expr,

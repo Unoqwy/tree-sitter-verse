@@ -19,11 +19,11 @@ if (100 > 0) {}
 'case' matching
 ===============================
 
-case(Number) {
+case(Number):
   0 => '0'
-  1 => '1'
+  1 =>
+    '1'
   _ => {}
-}
 
 ---
 
@@ -38,7 +38,8 @@ case(Number) {
         rhs: (char))
       (fat_arrow_expression
         lhs: (integer)
-        rhs: (char))
+        rhs: (block
+          (char)))
       (fat_arrow_expression
         lhs: (identifier)
         rhs: (block)))))

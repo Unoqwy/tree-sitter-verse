@@ -921,12 +921,8 @@
             "type": "SEQ",
             "members": [
               {
-                "type": "STRING",
-                "value": ":"
-              },
-              {
                 "type": "SYMBOL",
-                "name": "_open_indent_block"
+                "name": "_open_indent_block_colon"
               },
               {
                 "type": "REPEAT",
@@ -1667,6 +1663,10 @@
     {
       "type": "SYMBOL",
       "name": "_open_indent_block"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_open_indent_block_colon"
     },
     {
       "type": "SYMBOL",

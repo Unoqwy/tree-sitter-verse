@@ -58,6 +58,22 @@ class (supertype, interface) {}
     (block)))
 
 ===============================
+Macro call parameters (indented block)
+===============================
+
+class (supertype, interface):
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    arguments: (argument_list
+      (identifier)
+      (identifier))
+    (block)))
+
+===============================
 Basic curly block
 ===============================
 
