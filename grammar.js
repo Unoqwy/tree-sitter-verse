@@ -34,7 +34,7 @@ module.exports = grammar({
 
   externals: $ => [
     $._auto_terminator,
-    $._open_braced_block,
+    '{',
     $._open_indent_block,
     $._open_indent_block_colon,
     $._close_indent_block,
@@ -49,8 +49,11 @@ module.exports = grammar({
     [$._stdexpr],
   ],
 
+  extras: $ => [/\s+/, $.comment],
+
   rules: {
     source_file: $ => repeat($._complete_expr),
+    comment: _ => token(seq('#', /.*/)),
 
     _complete_expr: $ => seq(
       $._expr,
@@ -71,12 +74,12 @@ module.exports = grammar({
     // are kept transparent to keep workable trees
     _stdexpr: $ =>
       prec.right(seq(
-        optional($.at_attributes),
+        optional(field('pre_attributes', $.at_attributes)),
         choice(
-          seq('(', $._expr, /\s*[)]/),
+          seq('(', $._expr, ')'),
           $._standalone_expr,
         ),
-        optional($.attributes),
+        optional(field('attributes', $.attributes)),
     )),
     // the official parser deals with ```verse
     // if. (0 < 1 > 0)
@@ -117,16 +120,23 @@ module.exports = grammar({
       $.macro_call,
       $.function_call,
       $.field_expression,
+
+      $.continue_expression,
+      $.break_expression,
     ),
     _non_attributable_expr: $ => choice(
+      $.comma_separated_group,
+
       $.declaration,
       $.function_declaration,
+
+      $.set_expression,
+      $.return_expression,
+      $.map_container,
 
       $.unary_expression,
       $.binary_expression,
       $.fat_arrow_expression,
-
-      $.comma_separated_group,
     ),
     //#endregion
 
@@ -176,15 +186,24 @@ module.exports = grammar({
     ),
     string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "\\{"))),
     string_template: $ => seq(
-      /[{]\s*/,
+      '{',
       $._expr,
-      /\s*[}]/,
+      '}',
     ),
     char: _ => /'[^\']*'/,
     //#endregion
 
+    map_container: $ => seq(
+      '[',
+      field('key', $._stdexpr),
+      ']',
+      field('value', $._stdexpr),
+    ),
+
+    var_keyword: _ => 'var',
     declaration: $ =>
       prec.left(seq(
+        optional($.var_keyword),
         field('lhs', $._stdexpr),
         choice(
           seq(
@@ -196,7 +215,7 @@ module.exports = grammar({
           ),
           seq(
             ':',
-            field('rhs', $._expr),
+            field('type_hint', $._expr),
           ),
           seq(
             ':=',
@@ -204,6 +223,21 @@ module.exports = grammar({
           ),
         ),
       )),
+
+    set_expression: $ => 
+      prec.left(10, seq(
+        'set',
+        field('lhs', $._stdexpr),
+        '=',
+        field('rhs', $._inline_body),
+      )),
+    return_expression: $ =>
+      prec.left(10, seq(
+        'return',
+        optional($._expr),
+      )),
+    continue_expression: _ => 'continue',
+    break_expression: _ => 'break',
 
     function_call: $ =>
       prec.left(seq(
@@ -241,9 +275,9 @@ module.exports = grammar({
     macro_block: $ =>
       prec.right(choice(
         seq(
-          $._open_braced_block,
+          '{',
           repeat($._complete_expr),
-          /\s*[}]/,
+          '}',
         ),
         seq(
           $._open_indent_block_colon,
@@ -255,7 +289,7 @@ module.exports = grammar({
           $._close_indent_block,
         ),
         seq(
-          /[.] +/,
+          '. ',
           $._expr,
         ),
       )),
@@ -267,9 +301,9 @@ module.exports = grammar({
       )),
     block: $ => choice(
       seq(
-        $._open_braced_block,
+        '{',
         repeat($._complete_expr),
-        /\s*[}]/,
+        '}',
       ),
       seq(
         $._open_indent_block,
@@ -339,7 +373,6 @@ module.exports = grammar({
         ['not', PREC.not ],
         ['+'  , PREC.sign],
         ['-'  , PREC.sign],
-        ['set', PREC.decl],
       ];
       /** @type [string, number][] */
       const suffix_table = [

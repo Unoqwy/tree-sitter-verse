@@ -106,7 +106,7 @@ MyFunc<private>()<transacts><decides>: void ={}
 (source_file
   (function_declaration
     name: (identifier)
-    name: (attributes
+    attributes: (attributes
       (identifier))
     effects: (attributes
       (identifier)
@@ -143,7 +143,7 @@ MyFunc(
     name: (identifier)
     parameters: (declaration
       lhs: (identifier)
-      rhs: (identifier))
+      type_hint: (identifier))
     ret_type: (identifier)
     (block)))
 

@@ -16,6 +16,40 @@ if (100 > 0) {}
     (block)))
 
 ===============================
+'else' branch
+===============================
+
+if {
+} else {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block))
+  (macro_call
+    macro: (identifier)
+    (block)))
+
+===============================
+'else if' branch
+===============================
+
+if {
+} else if {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block))
+  (macro_call
+    macro: (identifier)
+    (block)))
+
+===============================
 'case' matching
 ===============================
 
@@ -58,7 +92,7 @@ for (Player:GetPlayer()) {}
     arguments: (argument_list
       (declaration
         lhs: (identifier)
-        rhs: (function_call
+        type_hint: (function_call
           function: (identifier)
           arguments: (argument_list))))
     (block)))

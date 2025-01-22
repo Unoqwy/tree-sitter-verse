@@ -1,0 +1,16 @@
+===============================
+Line comment
+===============================
+
+# Hello World
+0# Hello
+1
+
+---
+
+(source_file
+  (comment)
+  (integer)
+  (comment)
+  (integer))
+

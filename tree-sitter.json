@@ -5,7 +5,10 @@
       "camelcase": "Verse",
       "scope": "source.verse",
       "file-types": [
-        ".verse"
+        "verse"
+      ],
+      "highlights": [
+        "queries/highlights.scm"
       ],
       "content-regex": "(using\\s*\\{|<(public|private|internal)>)",
       "injection-regex": "^verse$"

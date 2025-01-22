@@ -71,7 +71,7 @@ Parenthesized several attributes
 
 (source_file
   (declaration
-    lhs: (at_attributes
+    pre_attributes: (at_attributes
       (identifier))
     lhs: (identifier)
     type_hint: (identifier)

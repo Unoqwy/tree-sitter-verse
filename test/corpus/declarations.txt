@@ -9,7 +9,7 @@ Var:1
 (source_file
   (declaration
     lhs: (identifier)
-    rhs: (integer)))
+    type_hint: (integer)))
 
 ===============================
 Declaration with type hint
@@ -21,6 +21,21 @@ Var: int = 0
 
 (source_file
   (declaration
+    lhs: (identifier)
+    type_hint: (identifier)
+    rhs: (integer)))
+
+===============================
+Variable declaration
+===============================
+
+var Var: int = 0
+
+---
+
+(source_file
+  (declaration
+    (var_keyword)
     lhs: (identifier)
     type_hint: (identifier)
     rhs: (integer)))
