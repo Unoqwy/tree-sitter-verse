@@ -8,7 +8,6 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-const INLINE_WHITESPACE = /[ ]+/;
 const ANYLINE_WHITESPACE = /\s*/;
 
 /**
@@ -16,6 +15,7 @@ const ANYLINE_WHITESPACE = /\s*/;
   * @type {Object.<string, number>}
   */
 const PREC = {
+  fat_arrow: 10,
   query: 9,
   opt: 9,
   not: 8,
@@ -44,13 +44,6 @@ module.exports = grammar({
     $._error_sentinel,
   ],
 
-  // TODO : figure out if strict newline handling is needed
-  // extras: _ => [INLINE_WHITESPACE],
-
-  conflicts: $ => [
-    [$.function_call, $.function_declaration],
-  ],
-
   rules: {
     source_file: $ => repeat($._complete_expr),
 
@@ -60,10 +53,10 @@ module.exports = grammar({
     ),
 
     //#region Expression Kinds
-    _expr: $ => choice(
+    _expr: $ => prec.left(choice(
       $._stdexpr,
       $._non_attributable_expr,
-    ),
+    )),
     // in Verse, *everything* is an expression
     // you can write mad stuff like ```verse
     // (((class_name))<internal>):=((class)<(final)>(){})
@@ -103,6 +96,7 @@ module.exports = grammar({
       $.integer,
       $.float,
       $.string,
+      $.char,
 
       $.macro_call,
       $.function_call,
@@ -113,6 +107,7 @@ module.exports = grammar({
 
       $.unary_expression,
       $.binary_expression,
+      $.fat_arrow_expression,
 
       $.comma_separated_group,
     ),
@@ -160,20 +155,60 @@ module.exports = grammar({
       $._expr,
       /\s*[}]/,
     ),
+    char: _ => /'[^\']*'/,
     //#endregion
 
-    declaration: $ => prec.left(PREC.decl, seq(
-      field('lhs', $._expr),
-      choice(
-        seq(':', field('type_hint', $._expr), '='),
-        ':='
-      ),
-      field('rhs', $._expr),
-    )),
+    declaration: $ =>
+      prec.left(seq(
+        field('lhs', $._stdexpr),
+        choice(
+          seq(
+            seq(':', field('type_hint', $._expr)),
+            seq(
+              '=',
+              field('rhs', $._inline_body),
+            ),
+          ),
+          seq(
+            ':',
+            field('rhs', $._expr),
+          ),
+          seq(
+            ':=',
+            field('rhs', $._inline_body),
+          ),
+        ),
+      )),
+
+    function_call: $ =>
+      prec.left(seq(
+        field('function', $._stdexpr),
+        field('arguments', $.argument_list),
+      )),
+    function_declaration: $ =>
+      prec.left(1, seq(
+        field('name', $._stdexpr),
+        field('parameters', $._argument_list_paren),
+        optional(field('effects', $.attributes)),
+        ':',
+        field('ret_type', $._expr),
+        optional(seq(
+          choice('=', ':='),
+          $._inline_body,
+        )),
+      )),
+
+    argument_list: $ => choice(
+      $._argument_list_paren,
+      $._argument_list_square,
+    ),
+    _argument_list_paren: $ => createArgumentList($, "(", ")"),
+    _argument_list_square: $ => createArgumentList($, "[", "]"),
 
     //#region Blocks
     macro_call: $ => prec.left(1, seq(
       field('macro', $._stdexpr),
+      optional(field('arguments', $.argument_list)),
       alias($.macro_block, $.block),
     )),
 
@@ -218,24 +253,6 @@ module.exports = grammar({
     //#endregion
 
     //#region Functions
-    function_call: $ => {
-      const inner = optional(field('arguments', $.argument_list));
-      return seq(
-        field('function', $._stdexpr),
-        choice(
-          seq('(', inner, /\s*[)]/),
-          seq('[', inner, /\s*\]/),
-        ),
-      );
-    },
-    argument_list: $ => separated1(
-      ",",
-      choice(
-        $._expr,
-        $.named_argument
-      ),
-      optional(","),
-    ),
     named_argument: $ => prec.left(PREC.decl, seq(
       '?',
       field('name', $.identifier),
@@ -243,19 +260,6 @@ module.exports = grammar({
       $._expr,
     )),
 
-    function_declaration: $ => prec.left(seq(
-      field('name', $._stdexpr),
-      '(',
-      // TODO : parameters
-      /\s*[)]/,
-      optional(field('effects', $.attributes)),
-      ':',
-      field('ret_type', $._expr),
-      optional(seq(
-        choice('=', ':='),
-        $._inline_body,
-      )),
-    )),
     //#endregion
 
     //#region Operators
@@ -277,12 +281,17 @@ module.exports = grammar({
       ];
       return choice(...binary_table.map(
         ([op, pval]) => prec.left(pval, seq(
-          field('left', $._expr),
+          field('lhs', $._expr),
           field('operator', op),
-          field('right', $._expr) 
+          field('rhs', $._expr) 
          )),
       ));
     },
+    fat_arrow_expression: $ => prec.left(PREC.fat_arrow, seq(
+      field('lhs', $._expr),
+      '=>',
+      field('rhs', $._inline_body),
+    )),
 
     unary_expression: $ => {
       /** @type [string, number][] */
@@ -313,6 +322,28 @@ module.exports = grammar({
     //#endregion
   }
 });
+
+/**
+  * Creates an argument list variant with a start and end.
+  * @param {GrammarSymbols<any>} $
+  * @param {string} start
+  * @param {string} end
+  * @returns {SeqRule}
+  */
+function createArgumentList($, start, end) {
+  return seq(
+    start,
+    optional(separated1(
+      ",",
+      choice(
+        $._expr,
+        $.named_argument
+      ),
+      optional(","),
+    )),
+    end,
+  );
+}
 
 /**
   * Creates a rule for array-like elements with a separator.

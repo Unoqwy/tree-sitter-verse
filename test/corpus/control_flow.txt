@@ -1,14 +1,64 @@
 ===============================
-'for' loop iterate
+'if' condition
 ===============================
 
-Player : Ent
+if (100 > 0) {}
 
 ---
 
 (source_file
   (macro_call
-    (identifier)
+    macro: (identifier)
+    arguments: (argument_list
+      (binary_expression
+        lhs: (integer)
+        rhs: (integer)))
+    (block)))
+
+===============================
+'case' matching
+===============================
+
+case(Number) {
+  0 => '0'
+  1 => '1'
+  _ => {}
+}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    arguments: (argument_list
+      (identifier))
     (block
-      (path_literal))))
+      (fat_arrow_expression
+        lhs: (integer)
+        rhs: (char))
+      (fat_arrow_expression
+        lhs: (integer)
+        rhs: (char))
+      (fat_arrow_expression
+        lhs: (identifier)
+        rhs: (block)))))
+
+===============================
+'for' loop iterate
+===============================
+
+for (Player:GetPlayer()) {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    arguments: (argument_list
+      (declaration
+        lhs: (identifier)
+        rhs: (function_call
+          function: (identifier)
+          arguments: (argument_list))))
+    (block)))
 

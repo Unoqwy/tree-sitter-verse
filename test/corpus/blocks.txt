@@ -36,10 +36,9 @@ class (supertype) {}
 
 (source_file
   (macro_call
-    macro: (function_call
-      function: (identifier)
-      arguments: (argument_list
-        (identifier)))
+    macro: (identifier)
+    arguments: (argument_list
+      (identifier))
     (block)))
 
 ===============================
@@ -52,11 +51,10 @@ class (supertype, interface) {}
 
 (source_file
   (macro_call
-    macro: (function_call
-      function: (identifier)
-      arguments: (argument_list
-        (identifier)
-        (identifier)))
+    macro: (identifier)
+    arguments: (argument_list
+      (identifier)
+      (identifier))
     (block)))
 
 ===============================

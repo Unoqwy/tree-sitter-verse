@@ -50,7 +50,8 @@ Var :=
 (source_file
   (declaration
     lhs: (identifier)
-    rhs: (integer)))
+    rhs: (block
+      (integer))))
 
 ===============================
 Block declaration
@@ -65,6 +66,6 @@ Var := {
 (source_file
   (declaration
     lhs: (identifier)
-    rhs: (block(
-     (integer)))))
+    rhs: (block
+     (integer))))
 

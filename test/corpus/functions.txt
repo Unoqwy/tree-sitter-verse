@@ -9,9 +9,11 @@ Clear[]
 
 (source_file
   (function_call
-    function: (identifier))
+    function: (identifier)
+    arguments: (argument_list))
   (function_call
-    function: (identifier)))
+    function: (identifier)
+    arguments: (argument_list)))
 
 ===============================
 Single argument function call
@@ -125,6 +127,25 @@ MyFunc(): int = 10
     name: (identifier)
     ret_type: (identifier)
     (integer)))
+
+===============================
+Function declaration with multiline parameters
+===============================
+
+MyFunc(
+  Param1:int,
+): void ={}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    parameters: (declaration
+      lhs: (identifier)
+      rhs: (identifier))
+    ret_type: (identifier)
+    (block)))
 
 ===============================
 Function declaration with curly block
