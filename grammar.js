@@ -54,41 +54,45 @@ module.exports = grammar({
     ),
 
     //#region Expression Kinds
-    _expr: $ => prec.left(choice(
-      $._stdexpr,
-      $._non_attributable_expr,
-    )),
+    _expr: $ =>
+      prec.left(choice(
+        $._stdexpr,
+        $._non_attributable_expr,
+      )),
     // in Verse, *everything* is an expression
     // you can write mad stuff like ```verse
     // (((class_name))<internal>):=((class)<(final)>(){})
     // ```
     // so, among other considerations, parenthesized expressions
     // are kept transparent to keep workable trees
-    _stdexpr: $ => prec.right(seq(
-      choice(
-        seq('(', ANYLINE_WHITESPACE, $._expr, /\s*[)]/),
-        $._standalone_expr,
-      ),
-      optional($.attributes),
+    _stdexpr: $ =>
+      prec.right(seq(
+        choice(
+          seq('(', ANYLINE_WHITESPACE, $._expr, /\s*[)]/),
+          $._standalone_expr,
+        ),
+        optional($.attributes),
     )),
     // the official parser deals with ```verse
     // if. (0 < 1 > 0)
     // ``` by reading 0<1> and unknown trailing "0"
-    attributes: $ => prec.right(seq(
-      $._best_guess_attr_start,
-      repeat1(prec.left(PREC.cmp, seq(
-        '<', $._expr, '>',
-      ))),
-    )),
+    attributes: $ =>
+      prec.right(seq(
+        $._best_guess_attr_start,
+        repeat1(prec.left(PREC.cmp, seq(
+          '<', $._expr, '>',
+        ))),
+      )),
 
-    comma_separated_group: $ => prec.right(seq(
-      $._expr,
-      repeat1(prec.left(seq(
-        ",",
+    comma_separated_group: $ =>
+      prec.right(seq(
         $._expr,
-      ))),
-      optional(",")
-    )),
+        repeat1(prec.left(seq(
+          ",",
+          $._expr,
+        ))),
+        optional(",")
+      )),
 
     _standalone_expr: $ => choice(
       $.identifier,
@@ -101,6 +105,7 @@ module.exports = grammar({
 
       $.macro_call,
       $.function_call,
+      $.field_expression,
     ),
     _non_attributable_expr: $ => choice(
       $.declaration,
@@ -207,33 +212,40 @@ module.exports = grammar({
     _argument_list_square: $ => createArgumentList($, "[", "]"),
 
     //#region Blocks
-    macro_call: $ => prec.left(1, seq(
-      field('macro', $._stdexpr),
-      optional(field('arguments', $.argument_list)),
-      alias($.macro_block, $.block),
-    )),
+    macro_call: $ =>
+      prec.left(1, seq(
+        field('macro', $._stdexpr),
+        optional(field('arguments', $.argument_list)),
+        alias($.macro_block, $.block),
+      )),
 
-    macro_block: $ => prec.right(choice(
-      seq(
-        $._open_braced_block,
-        repeat($._complete_expr),
-        /\s*[}]/,
-      ),
-      seq(
-        $._open_indent_block_colon,
-        repeat(seq(
-          $._indent,
-          $._complete_expr,
-          $._dedent,
-        )),
-        $._close_indent_block,
-      ),
-    )),
+    macro_block: $ =>
+      prec.right(choice(
+        seq(
+          $._open_braced_block,
+          repeat($._complete_expr),
+          /\s*[}]/,
+        ),
+        seq(
+          $._open_indent_block_colon,
+          repeat(seq(
+            $._indent,
+            $._complete_expr,
+            $._dedent,
+          )),
+          $._close_indent_block,
+        ),
+        seq(
+          /[.] +/,
+          $._expr,
+        ),
+      )),
 
-    _inline_body: $ => prec.left(10, choice(
-      $.block,
-      $._expr,
-    )),
+    _inline_body: $ =>
+      prec.left(10, choice(
+        $.block,
+        $._expr,
+      )),
     block: $ => choice(
       seq(
         $._open_braced_block,
@@ -253,12 +265,13 @@ module.exports = grammar({
     //#endregion
 
     //#region Functions
-    named_argument: $ => prec.left(PREC.decl, seq(
-      '?',
-      field('name', $.identifier),
-      ':=',
-      $._expr,
-    )),
+    named_argument: $ =>
+      prec.left(PREC.decl, seq(
+        '?',
+        field('name', $.identifier),
+        ':=',
+        $._expr,
+      )),
 
     //#endregion
 
@@ -287,11 +300,18 @@ module.exports = grammar({
          )),
       ));
     },
-    fat_arrow_expression: $ => prec.left(PREC.fat_arrow, seq(
-      field('lhs', $._expr),
-      '=>',
-      field('rhs', $._inline_body),
-    )),
+    fat_arrow_expression: $ =>
+      prec.left(PREC.fat_arrow, seq(
+        field('lhs', $._expr),
+        '=>',
+        field('rhs', $._inline_body),
+      )),
+    field_expression: $ =>
+      prec.left(PREC.decl, seq(
+        field('target', $._stdexpr),
+        token.immediate('.'),
+        field('field', $._stdexpr),
+      )),
 
     unary_expression: $ => {
       /** @type [string, number][] */

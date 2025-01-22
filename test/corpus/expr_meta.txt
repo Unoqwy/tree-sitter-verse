@@ -75,3 +75,33 @@ Comma separated group
     (integer)
     (integer)))
 
+===============================
+Field access
+===============================
+
+a.b
+
+---
+
+(source_file
+  (field_expression
+    target: (identifier)
+    field: (identifier)))
+
+===============================
+Chain field access
+===============================
+
+a.b.c()
+
+---
+
+(source_file
+  (function_call
+    function: (field_expression
+      target: (field_expression
+        target: (identifier)
+        field: (identifier))
+      field: (identifier))
+    arguments: (argument_list)))
+

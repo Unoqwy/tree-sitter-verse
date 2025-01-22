@@ -13,6 +13,20 @@ using { /Github.com/Gost }
       (path_literal))))
 
 ===============================
+'using' macro with dot form
+===============================
+
+using. /Github.com/Gost
+
+---
+
+(source_file
+  (macro_call
+    (identifier)
+    (block
+      (path_literal))))
+
+===============================
 'option' macro
 ===============================
 
