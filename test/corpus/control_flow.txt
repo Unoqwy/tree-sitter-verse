@@ -16,11 +16,33 @@ if (100 > 0) {}
     (block)))
 
 ===============================
+'if' condition block
+===============================
+
+if (
+  100 > 0
+  50 > 10
+) {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    arguments: (argument_list
+      (binary_expression
+        lhs: (integer)
+        rhs: (integer))
+      (binary_expression
+        lhs: (integer)
+        rhs: (integer)))
+    (block)))
+
+===============================
 'else' branch
 ===============================
 
-if {
-} else {}
+if {} else {}
 
 ---
 
@@ -29,10 +51,10 @@ if {
     macro: (identifier)
     (block))
   (macro_call
-    macro: (identifier)
+    (else_keyword)
     (block)))
 
-===============================
+==============================
 'else if' branch
 ===============================
 
@@ -46,7 +68,59 @@ if {
     macro: (identifier)
     (block))
   (macro_call
+    (else_keyword)
     macro: (identifier)
+    (block)))
+
+==============================
+'else if' branch with condition
+===============================
+
+if {
+} else if (1 > 0) {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block))
+  (macro_call
+    (else_keyword)
+    macro: (identifier)
+    arguments: (argument_list
+      (binary_expression
+        lhs: (integer)
+        rhs: (integer)))
+    (block)))
+
+==============================
+'else' multiline
+===============================
+
+if {}
+
+then {}
+
+else if {}
+
+else {}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block))
+  (macro_call
+    macro: (identifier)
+    (block))
+  (macro_call
+    (else_keyword)
+    macro: (identifier)
+    (block))
+  (macro_call
+    (else_keyword)
     (block)))
 
 ===============================

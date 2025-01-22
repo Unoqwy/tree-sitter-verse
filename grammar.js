@@ -47,6 +47,8 @@ module.exports = grammar({
 
   conflicts: $ => [
     [$._stdexpr],
+    [$._stdexpr, $._argument_list_paren],
+    [$.macro_call],
   ],
 
   extras: $ => [/\s+/, $.comment],
@@ -102,10 +104,9 @@ module.exports = grammar({
       prec.right(seq(
         $._expr,
         repeat1(prec.left(seq(
-          ",",
+          alias(/\s*[,]/, ","),
           $._expr,
         ))),
-        optional(",")
       )),
 
     _standalone_expr: $ => choice(
@@ -118,6 +119,7 @@ module.exports = grammar({
       $.char,
 
       $.macro_call,
+
       $.function_call,
       $.field_expression,
 
@@ -184,7 +186,7 @@ module.exports = grammar({
       )),
       choice('"', $._incomplete_string),
     ),
-    string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "\\{"))),
+    string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "}"))),
     string_template: $ => seq(
       '{',
       $._expr,
@@ -193,12 +195,13 @@ module.exports = grammar({
     char: _ => /'[^\']*'/,
     //#endregion
 
-    map_container: $ => seq(
-      '[',
-      field('key', $._stdexpr),
-      ']',
-      field('value', $._stdexpr),
-    ),
+    map_container: $ =>
+      prec.left(seq(
+        '[',
+        field('key', $._stdexpr),
+        ']',
+        field('value', $._stdexpr),
+      )),
 
     var_keyword: _ => 'var',
     declaration: $ =>
@@ -261,13 +264,20 @@ module.exports = grammar({
       $._argument_list_paren,
       $._argument_list_square,
     ),
-    _argument_list_paren: $ => createArgumentList($, "(", ")"),
-    _argument_list_square: $ => createArgumentList($, "[", "]"),
+    _argument_list_paren: $ => createArgumentList($, '(', ')'),
+    _argument_list_square: $ => createArgumentList($, '[', ']'),
 
     //#region Blocks
+    else_keyword: _ => 'else',
     macro_call: $ =>
       prec.left(1, seq(
-        field('macro', $._stdexpr),
+        choice(
+          seq(
+            $.else_keyword,
+            optional(field('macro', $._stdexpr)),
+          ),
+          field('macro', $._stdexpr),
+        ),
         optional(field('arguments', $.argument_list)),
         alias($.macro_block, $.block),
       )),
@@ -405,14 +415,17 @@ module.exports = grammar({
 function createArgumentList($, start, end) {
   return seq(
     start,
-    optional(separated1(
-      ",",
-      choice(
-        $._expr,
-        $.named_argument
+    choice(
+      separated1(
+        ",",
+        choice(
+          $._expr,
+          $.named_argument
+        ),
+        optional(","),
       ),
-      optional(","),
-    )),
+      repeat($._complete_expr),
+    ),
     end,
   );
 }

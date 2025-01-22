@@ -2017,6 +2017,10 @@
             "named": false
           },
           {
+            "type": ";",
+            "named": false
+          },
+          {
             "type": "at_attributes",
             "named": true
           },
@@ -2387,7 +2391,7 @@
       },
       "macro": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "(",
@@ -2503,11 +2507,15 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "else_keyword",
           "named": true
         }
       ]
@@ -3859,10 +3867,6 @@
     "named": false
   },
   {
-    "type": "\\{",
-    "named": false
-  },
-  {
     "type": "]",
     "named": false
   },
@@ -3884,6 +3888,10 @@
   },
   {
     "type": "continue_expression",
+    "named": true
+  },
+  {
+    "type": "else_keyword",
     "named": true
   },
   {

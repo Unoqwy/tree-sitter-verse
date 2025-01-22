@@ -2,6 +2,8 @@
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/array.h"
 
+#include <ctype.h>
+
 enum TokenType {
     AUTO_TERMINATOR,
     OPEN_BRACED_BLOCK,
@@ -77,25 +79,49 @@ static bool scan_auto_terminator(
 ) {
     if (lexer->eof(lexer)) {
         lexer->mark_end(lexer);
-    } else if (!met_newline) {
-        switch (lexer->lookahead) {
-            case 0:
-            case ')':
-            case ']':
-            case '}':
-                lexer->mark_end(lexer);
-                break;
-            case '\n':
-            case '\r':
-                lexer->advance(lexer, false);
-                lexer->mark_end(lexer);
-                break;
-            default:
-                return false;
-        }
+        return true;
+    } else if (met_newline) {
+        return true;
     }
 
-    return true;
+    switch (lexer->lookahead) {
+        case 0:
+        case ')':
+        case ']':
+        case '}':
+        case '\n':
+        case '\r':
+            lexer->mark_end(lexer);
+            lexer->advance(lexer, true);
+            return true;
+        default:
+            break;
+    }
+
+    // macro chaining
+    bool met_alnum = false;
+    for (;;) {
+        if (lexer->eof(lexer)) {
+            break;
+        }
+        if (lexer->lookahead == ' ') {
+            lexer->advance(lexer, true);
+            continue;
+        }
+        if (isalnum(lexer->lookahead)) {
+            lexer->advance(lexer, true);
+            if (!met_alnum) {
+                met_alnum = true;
+            }
+            continue;
+        }
+        if (lexer->lookahead == '{' || (met_alnum && lexer->lookahead == '(')) {
+            // note: '(' is best guess to give it leeway for `else if *()*`
+            return true;
+        }
+        break;
+    }
+    return false;
 }
 
 bool tree_sitter_verse_external_scanner_scan(

@@ -82,7 +82,8 @@
 
 (macro_call
   macro: (identifier) @keyword.conditional
-    (#match? @keyword.conditional "^(if|else|case)$"))
+    (#match? @keyword.conditional "^(if|else|case|then)$"))
+(else_keyword) @keyword.conditional
 
 (macro_call
   macro: (identifier) @keyword.repeat

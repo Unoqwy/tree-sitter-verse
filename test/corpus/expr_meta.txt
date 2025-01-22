@@ -92,6 +92,24 @@ Comma separated group
     (integer)))
 
 ===============================
+Comma separated group multiline
+===============================
+
+1,
+2,
+
+(3)
+
+
+---
+
+(source_file
+  (comma_separated_group
+    (integer)
+    (integer)
+    (integer)))
+
+===============================
 Field access
 ===============================
 
