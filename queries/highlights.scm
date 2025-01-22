@@ -19,9 +19,11 @@
   field: (identifier) @variable.member)
 
 (declaration
+  lhs: "("*
   lhs: (identifier) @constant)
 (declaration
   (var_keyword) @keyword
+  lhs: "("*
   lhs: (identifier) @variable)
 (set_expression
   lhs: (identifier) @variable)
@@ -66,28 +68,33 @@
 
 ; Builtin macros
 (declaration
+  lhs: "("*
   lhs: (identifier) @type
+  rhs: (macro_call
+    macro: (identifier) @_
+  (#match? @_ "^(class|enum|interface)$")))
+(declaration
   rhs: (macro_call
     macro: (identifier) @_
     arguments: (argument_list
       (identifier) @type)
-        (#match? @_ "^(class|enum|interface)$")))
+  (#match? @_ "^(class|enum|interface)$")))
 
 (macro_call
-  macro: (identifier) @function)
+  macro: (identifier) @function.macro)
 
 (macro_call
   macro: (identifier) @keyword
-    (#match? @keyword "^(class|enum|interface|profile|using|map|array|spawn|sync|race|rush|branch)$"))
+  (#match? @keyword "^(class|enum|interface|profile|using|map|array|spawn|sync|race|rush|branch)$"))
 
 (macro_call
   macro: (identifier) @keyword.conditional
-    (#match? @keyword.conditional "^(if|else|case|then)$"))
+  (#match? @keyword.conditional "^(if|else|case|then)$"))
 (else_keyword) @keyword.conditional
 
 (macro_call
   macro: (identifier) @keyword.repeat
-    (#match? @keyword.repeat "^(for|loop)$"))
+  (#match? @keyword.repeat "^(for|loop)$"))
 
 ; Tokens
 [
@@ -120,7 +127,9 @@
   ">="
   "?"
   ":"
+  "macro:"
   ":="
+  "=>"
 ] @operator
 
 [

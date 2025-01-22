@@ -36,7 +36,7 @@ module.exports = grammar({
     $._auto_terminator,
     '{',
     $._open_indent_block,
-    $._open_indent_block_colon,
+    "macro:",
     $._close_indent_block,
     $._indent,
     $._dedent,
@@ -135,6 +135,7 @@ module.exports = grammar({
       $.set_expression,
       $.return_expression,
       $.map_container,
+      $.array_container,
 
       $.unary_expression,
       $.binary_expression,
@@ -200,6 +201,11 @@ module.exports = grammar({
         '[',
         field('key', $._stdexpr),
         ']',
+        field('value', $._stdexpr),
+      )),
+    array_container: $ =>
+      prec.left(seq(
+        '[', ']',
         field('value', $._stdexpr),
       )),
 
@@ -290,7 +296,7 @@ module.exports = grammar({
           '}',
         ),
         seq(
-          $._open_indent_block_colon,
+          "macro:",
           repeat(seq(
             $._indent,
             $._complete_expr,
