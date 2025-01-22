@@ -68,7 +68,7 @@ module.exports = grammar({
     _stdexpr: $ =>
       prec.right(seq(
         choice(
-          seq('(', ANYLINE_WHITESPACE, $._expr, /\s*[)]/),
+          seq('(', $._expr, /\s*[)]/),
           $._standalone_expr,
         ),
         optional($.attributes),
@@ -119,7 +119,15 @@ module.exports = grammar({
     ),
     //#endregion
 
-    identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
+    qualifier: $ => seq(
+      '(',
+      $._expr,
+      ':)',
+    ),
+    identifier: $ => seq(
+      optional($.qualifier),
+      /[A-Za-z_][A-Za-z0-9_]*/
+    ),
     path_literal: _ => /[/][A-Za-z0-9_][A-Za-z0-9_\-.]*(\/[A-Za-z0-9_][A-Za-z0-9_\-.]*)*/,
     logic_literal: _ => choice('true', 'false'),
 

@@ -93,3 +93,20 @@ Path literal
 (source_file
   (path_literal))
 
+===============================
+Path qualifiers
+===============================
+
+(/Localhost:)Var
+(local:)Var
+
+---
+
+(source_file
+  (identifier
+    (qualifier
+      (path_literal)))
+  (identifier
+    (qualifier
+      (identifier))))
+
