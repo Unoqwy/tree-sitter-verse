@@ -38,6 +38,11 @@
   key: (identifier) @type)
 (map_container
   value: (identifier) @type)
+(unary_expression
+  operator: "?"
+  operand: (identifier) @type)
+(array_container
+  value: (identifier) @type)
 (function_declaration
   ret_type: (identifier) @type)
 (declaration
