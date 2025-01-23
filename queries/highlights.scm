@@ -11,12 +11,15 @@
 (path_literal) @string.special
 
 (function_call
-  function: (_) @function)
-(function_declaration
-  name: (_) @function)
-
+  function: (identifier) @function)
 (field_expression
   field: (identifier) @variable.member)
+(function_call
+  function: (field_expression
+    field: (identifier) @function))
+
+(function_declaration
+  name: (_) @function)
 
 (declaration
   lhs: "("*
