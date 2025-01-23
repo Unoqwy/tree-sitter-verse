@@ -389,6 +389,7 @@ module.exports = grammar({
         ['not', PREC.not ],
         ['+'  , PREC.sign],
         ['-'  , PREC.sign],
+        [':', PREC.query],
       ];
       /** @type [string, number][] */
       const suffix_table = [

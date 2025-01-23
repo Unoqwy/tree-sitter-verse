@@ -1941,6 +1941,31 @@
             "members": [
               {
                 "type": "FIELD",
+                "name": "operator",
+                "content": {
+                  "type": "STRING",
+                  "value": ":"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "operand",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expr"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "PREC_LEFT",
+          "value": 9,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
                 "name": "operand",
                 "content": {
                   "type": "SYMBOL",
