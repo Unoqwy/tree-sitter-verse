@@ -1,0 +1,64 @@
+===============================
+Character (ASCII)
+===============================
+
+'a'
+
+---
+
+(source_file
+  (char))
+
+===============================
+Empty string
+===============================
+
+""
+
+---
+
+(source_file
+  (string))
+
+===============================
+Simple string
+===============================
+
+"Simple String"
+
+---
+
+(source_file
+  (string
+    (string_fragment)))
+
+===============================
+String quote escaping
+===============================
+
+"\"Quoted\""
+"Quote < \"Some content\" >"
+
+---
+
+(source_file
+  (string
+    (string_fragment))
+  (string
+    (string_fragment)))
+
+===============================
+Comment format in strings
+===============================
+
+"#"
+"# Remain a string"
+
+---
+
+(source_file
+  (string
+    (string_fragment))
+  (string
+    (string_fragment)))
+

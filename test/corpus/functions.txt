@@ -115,6 +115,36 @@ MyFunc<private>()<transacts><decides>: void ={}
     (block)))
 
 ===============================
+Function declaration specifier only
+===============================
+
+MyFunc<private>(): void
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    attributes: (attributes
+      (identifier))
+    ret_type: (identifier)))
+
+===============================
+Function declaration effect only
+===============================
+
+MyFunc()<suspends>: void
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    effects: (attributes
+      (identifier))
+    ret_type: (identifier)))
+
+===============================
 Function declaration without block
 ===============================
 
@@ -179,4 +209,55 @@ MyFunc(): void =
     ret_type: (identifier)
     (block
       (integer))))
+
+===============================
+'of' call expression
+===============================
+
+Some of true
+
+---
+
+(source_file
+  (of_expression
+    lhs: (identifier)
+    rhs: (logic_literal)))
+
+===============================
+'of' call expression with parens
+===============================
+
+Some of (1)
+Some of (1, 2)
+
+---
+
+(source_file
+  (of_expression
+    lhs: (identifier)
+    rhs: (integer))
+  (of_expression
+    lhs: (identifier)
+    rhs: (block
+      (integer)
+      (integer))))
+
+===============================
+'of' call expression with macro
+===============================
+
+Some of array{1}
+
+---
+
+(source_file
+  (of_expression
+    lhs: (identifier)
+    rhs: (integer))
+  (of_expression
+    lhs: (identifier)
+    rhs: (macro_call
+      macro: (identifier)
+      (block
+        (integer)))))
 

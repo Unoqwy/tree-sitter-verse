@@ -235,9 +235,26 @@
         ]
       }
     },
+    "unit": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
     "_standalone_expr": {
       "type": "CHOICE",
       "members": [
+        {
+          "type": "SYMBOL",
+          "name": "unit"
+        },
         {
           "type": "SYMBOL",
           "name": "identifier"
@@ -277,14 +294,6 @@
         {
           "type": "SYMBOL",
           "name": "field_expression"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "continue_expression"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "break_expression"
         }
       ]
     },
@@ -309,15 +318,27 @@
         },
         {
           "type": "SYMBOL",
-          "name": "return_expression"
-        },
-        {
-          "type": "SYMBOL",
           "name": "map_container"
         },
         {
           "type": "SYMBOL",
           "name": "array_container"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "return_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "continue_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "break_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "yield_expression"
         },
         {
           "type": "SYMBOL",
@@ -330,6 +351,10 @@
         {
           "type": "SYMBOL",
           "name": "fat_arrow_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "of_expression"
         }
       ]
     },
@@ -559,6 +584,10 @@
             {
               "type": "PATTERN",
               "value": "[^\"{]"
+            },
+            {
+              "type": "STRING",
+              "value": "\\\""
             },
             {
               "type": "STRING",
@@ -817,12 +846,79 @@
       }
     },
     "continue_expression": {
-      "type": "STRING",
-      "value": "continue"
+      "type": "PREC_LEFT",
+      "value": 10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "continue"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_expr"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "break_expression": {
-      "type": "STRING",
-      "value": "break"
+      "type": "PREC_LEFT",
+      "value": 10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "break"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_expr"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "yield_expression": {
+      "type": "PREC_LEFT",
+      "value": 10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "yield"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_expr"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "function_call": {
       "type": "PREC_LEFT",
@@ -1798,6 +1894,35 @@
         ]
       }
     },
+    "of_expression": {
+      "type": "PREC_LEFT",
+      "value": 10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "lhs",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_expr"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "of"
+          },
+          {
+            "type": "FIELD",
+            "name": "rhs",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_expr"
+            }
+          }
+        ]
+      }
+    },
     "field_expression": {
       "type": "PREC_LEFT",
       "value": 1,
@@ -2005,6 +2130,10 @@
       "_argument_list_paren"
     ],
     [
+      "unit",
+      "_argument_list_paren"
+    ],
+    [
       "macro_call"
     ]
   ],
@@ -2052,5 +2181,6 @@
     }
   ],
   "inline": [],
-  "supertypes": []
+  "supertypes": [],
+  "reserved": {}
 }

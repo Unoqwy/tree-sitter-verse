@@ -8,14 +8,13 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-const ANYLINE_WHITESPACE = /\s*/;
-
 /**
   * Precedence table.
   * @type {Object.<string, number>}
   */
 const PREC = {
   fat_arrow: 10,
+  of: 10,
   query: 9,
   opt: 9,
   not: 8,
@@ -48,6 +47,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$._stdexpr],
     [$._stdexpr, $._argument_list_paren],
+    [$.unit, $._argument_list_paren],
     [$.macro_call],
   ],
 
@@ -109,7 +109,9 @@ module.exports = grammar({
         ))),
       )),
 
+    unit: _ => seq("(", ")"),
     _standalone_expr: $ => choice(
+      $.unit,
       $.identifier,
       $.path_literal,
       $.logic_literal,
@@ -122,9 +124,6 @@ module.exports = grammar({
 
       $.function_call,
       $.field_expression,
-
-      $.continue_expression,
-      $.break_expression,
     ),
     _non_attributable_expr: $ => choice(
       $.comma_separated_group,
@@ -133,13 +132,18 @@ module.exports = grammar({
       $.function_declaration,
 
       $.set_expression,
-      $.return_expression,
       $.map_container,
       $.array_container,
+
+      $.return_expression,
+      $.continue_expression,
+      $.break_expression,
+      $.yield_expression,
 
       $.unary_expression,
       $.binary_expression,
       $.fat_arrow_expression,
+      $.of_expression,
     ),
     //#endregion
 
@@ -187,7 +191,12 @@ module.exports = grammar({
       )),
       choice('"', $._incomplete_string),
     ),
-    string_fragment: _ => prec.right(repeat1(choice(/[^"{]/, "}"))),
+    string_fragment: _ =>
+      prec.right(repeat1(choice(
+        /[^"{]/,
+        "\\\"",
+        "}",
+      ))),
     string_template: $ => seq(
       '{',
       $._expr,
@@ -240,13 +249,10 @@ module.exports = grammar({
         '=',
         field('rhs', $._inline_body),
       )),
-    return_expression: $ =>
-      prec.left(10, seq(
-        'return',
-        optional($._expr),
-      )),
-    continue_expression: _ => 'continue',
-    break_expression: _ => 'break',
+    return_expression: $ => named_unary($, 'return'),
+    continue_expression: $ => named_unary($, 'continue'),
+    break_expression: $ => named_unary($, 'break'),
+    yield_expression: $ => named_unary($, 'yield'),
 
     function_call: $ =>
       prec.left(seq(
@@ -375,6 +381,12 @@ module.exports = grammar({
         '=>',
         field('rhs', $._inline_body),
       )),
+    of_expression: $ =>
+      prec.left(PREC.of, seq(
+        field('lhs', $._expr),
+        'of',
+        field('rhs', $._expr),
+      )),
     field_expression: $ =>
       prec.left(PREC.decl, seq(
         field('target', $._stdexpr),
@@ -450,5 +462,16 @@ function separated1(separator, rule, trail) {
     rules.push(trail);
   }
   return seq(...rules);
+}
+
+/** Creates a named unary expression rule.
+  * @param {GrammarSymbols<any>} $
+  * @param {string} keyword
+  */
+function named_unary($, keyword) {
+  return prec.left(10, seq(
+    keyword,
+    optional($._expr),
+  ));
 }
 

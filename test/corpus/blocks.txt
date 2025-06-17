@@ -2,7 +2,7 @@
 'using' macro
 ===============================
 
-using { /Github.com/Gost }
+using { /Github.com/Ghost }
 
 ---
 
@@ -16,7 +16,7 @@ using { /Github.com/Gost }
 'using' macro with dot form
 ===============================
 
-using. /Github.com/Gost
+using. /Github.com/Ghost
 
 ---
 
@@ -232,4 +232,68 @@ block:
             (block
               (integer)))))))
   (integer))
+
+===============================
+Empty paren block
+===============================
+
+()
+
+---
+
+(source_file
+  (unit))
+
+===============================
+Paren block with one value 
+===============================
+
+(1)
+(2;)
+
+---
+
+(source_file
+  (integer)
+  (integer))
+
+===============================
+Paren block with various indents
+===============================
+
+(1
+
+2;3
+4
+
+   5)
+
+---
+
+(source_file
+  (integer)
+  (integer)
+  (integer)
+  (integer)
+  (integer))
+
+===============================
+Comma separated paren block
+===============================
+
+(1, 2, 3)
+(1, 2;, 3)
+
+---
+
+(source_file
+  (comma_separated_group
+    (integer)
+    (integer)
+    (integer)))
+  (comma_separated_group
+    (integer)
+    (integer))
+    (ERROR)
+    (integer)))
 
