@@ -148,3 +148,40 @@
 
 1 or 1
 
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+'to' operator
+===============================
+
+1 to 1
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (integer)))
+
+===============================
+Named operator/function conflict
+===============================
+
+1 and ()
+1 and (1)
+
+---
+
+(source_file
+  (binary_expression
+    (integer)
+    (unit))
+  (binary_expression
+    (integer)
+    (integer)))
+

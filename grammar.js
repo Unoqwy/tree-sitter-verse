@@ -14,6 +14,7 @@
   */
 const PREC = {
   fat_arrow: 10,
+  to: 10,
   of: 10,
   query: 9,
   opt: 9,
@@ -366,6 +367,7 @@ module.exports = grammar({
         ['>=' , PREC.cmp ],
         ['and', PREC.and ],
         ['or' , PREC.or  ],
+        ['to' , PREC.to  ],
       ];
       return choice(...binary_table.map(
         ([op, pval]) => prec.left(pval, seq(

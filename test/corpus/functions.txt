@@ -238,7 +238,7 @@ Some of (1, 2)
     rhs: (integer))
   (of_expression
     lhs: (identifier)
-    rhs: (block
+    rhs: (comma_separated_group
       (integer)
       (integer))))
 
@@ -251,9 +251,6 @@ Some of array{1}
 ---
 
 (source_file
-  (of_expression
-    lhs: (identifier)
-    rhs: (integer))
   (of_expression
     lhs: (identifier)
     rhs: (macro_call

@@ -2,6 +2,7 @@
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/array.h"
 
+#include <stdio.h>
 #include <ctype.h>
 
 enum TokenType {
@@ -99,7 +100,7 @@ static bool scan_auto_terminator(
     }
 
     // macro chaining
-    bool met_alnum = false;
+    size_t else_pos = 0;
     for (;;) {
         if (lexer->eof(lexer)) {
             break;
@@ -108,15 +109,20 @@ static bool scan_auto_terminator(
             lexer->advance(lexer, true);
             continue;
         }
-        if (isalnum(lexer->lookahead)) {
+        if (else_pos < 4 && lexer->lookahead == "else"[else_pos]) {
             lexer->advance(lexer, true);
-            if (!met_alnum) {
-                met_alnum = true;
-            }
+            else_pos += 1;
             continue;
         }
-        if (lexer->lookahead == '{' || (met_alnum && lexer->lookahead == '(')) {
-            // note: '(' is best guess to give it leeway for `else if *()*`
+        if (isalnum(lexer->lookahead)) {
+            if (else_pos < 4) {
+                return false;
+            }
+            lexer->advance(lexer, true);
+            continue;
+        }
+        if (lexer->lookahead == '{' || (lexer->lookahead == '(' && else_pos == 4)) {
+            // note: '(' after meeting an 'else' terminates the else-preceding macro
             return true;
         }
         break;
@@ -173,7 +179,7 @@ bool tree_sitter_verse_external_scanner_scan(
 
     bool met_newline = false;
     bool compat_with_terminator = true;
-    int indent_len = 0;
+    uint16_t indent_len = 0;
     bool check_other_lines = valid_symbols[OPEN_BRACED_BLOCK] || valid_symbols[INDENT];
     for (;;) {
         if (lexer->lookahead == ' ') {
