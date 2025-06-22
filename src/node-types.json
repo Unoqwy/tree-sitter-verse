@@ -4630,11 +4630,6 @@
     }
   },
   {
-    "type": "string_fragment",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "string_template",
     "named": true,
     "fields": {
@@ -5174,10 +5169,6 @@
     "named": false
   },
   {
-    "type": "\\\"",
-    "named": false
-  },
-  {
     "type": "]",
     "named": false
   },
@@ -5241,6 +5232,10 @@
   {
     "type": "set",
     "named": false
+  },
+  {
+    "type": "string_fragment",
+    "named": true
   },
   {
     "type": "to",

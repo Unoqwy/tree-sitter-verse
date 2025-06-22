@@ -48,17 +48,41 @@ String quote escaping
     (string_fragment)))
 
 ===============================
-Comment format in strings
+Singleline comment format in strings
 ===============================
 
+"Before #"
 "#"
-"# Remain a string"
+"# Start"
+"Before # After"
 
 ---
 
 (source_file
   (string
     (string_fragment))
+  (string
+    (string_fragment))
+  (string
+    (string_fragment))
+  (string
+    (string_fragment)))
+
+===============================
+Incomplete strings
+===============================
+
+"No ending quote
+11
+
+"Another not ending
+
+---
+
+(source_file
+  (string
+    (string_fragment))
+  (integer)
   (string
     (string_fragment)))
 

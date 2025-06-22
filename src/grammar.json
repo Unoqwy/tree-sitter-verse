@@ -562,8 +562,11 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "STRING",
-              "value": "\""
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "\""
+              }
             },
             {
               "type": "SYMBOL",
@@ -574,26 +577,13 @@
       ]
     },
     "string_fragment": {
-      "type": "PREC_RIGHT",
-      "value": 0,
+      "type": "IMMEDIATE_TOKEN",
       "content": {
-        "type": "REPEAT1",
+        "type": "PREC",
+        "value": 1,
         "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[^\"{]"
-            },
-            {
-              "type": "STRING",
-              "value": "\\\""
-            },
-            {
-              "type": "STRING",
-              "value": "}"
-            }
-          ]
+          "type": "PATTERN",
+          "value": "([^\"{\\n\\\\]|\\\\\")+"
         }
       }
     },
@@ -601,8 +591,11 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "{"
+          "type": "IMMEDIATE_TOKEN",
+          "content": {
+            "type": "STRING",
+            "value": "{"
+          }
         },
         {
           "type": "SYMBOL",
@@ -2211,6 +2204,14 @@
     {
       "type": "SYMBOL",
       "name": "_error_sentinel"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_string_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_string_start"
     }
   ],
   "inline": [],

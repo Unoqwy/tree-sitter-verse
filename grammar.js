@@ -43,6 +43,8 @@ module.exports = grammar({
     $._incomplete_string,
     $._best_guess_attr_start,
     $._error_sentinel,
+    $._string_content,
+    $._string_start,
   ],
 
   conflicts: $ => [
@@ -190,16 +192,14 @@ module.exports = grammar({
         $.string_fragment,
         $.string_template,
       )),
-      choice('"', $._incomplete_string),
+      choice(
+        token.immediate('"'),
+        $._incomplete_string
+      ),
     ),
-    string_fragment: _ =>
-      prec.right(repeat1(choice(
-        /[^"{]/,
-        "\\\"",
-        "}",
-      ))),
+    string_fragment: _ => token.immediate(prec(1, /([^"{\n\\]|\\")+/)),
     string_template: $ => seq(
-      '{',
+      token.immediate('{'),
       $._expr,
       '}',
     ),
