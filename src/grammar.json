@@ -398,7 +398,7 @@
     },
     "path_literal": {
       "type": "PATTERN",
-      "value": "[/][A-Za-z0-9_][A-Za-z0-9_\\-.]*(\\/[A-Za-z0-9_][A-Za-z0-9_\\-.]*)*"
+      "value": "[/][A-Za-z0-9_][A-Za-z0-9_\\-.]*(@[A-Za-z0-9_][A-Za-z0-9_\\-.]*)?(\\/[A-Za-z0-9_][A-Za-z0-9_\\-.]*)*"
     },
     "logic_literal": {
       "type": "CHOICE",

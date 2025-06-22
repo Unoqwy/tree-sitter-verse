@@ -159,7 +159,7 @@ module.exports = grammar({
       optional($.qualifier),
       /[A-Za-z_][A-Za-z0-9_]*/
     ),
-    path_literal: _ => /[/][A-Za-z0-9_][A-Za-z0-9_\-.]*(\/[A-Za-z0-9_][A-Za-z0-9_\-.]*)*/,
+    path_literal: _ => /[/][A-Za-z0-9_][A-Za-z0-9_\-.]*(@[A-Za-z0-9_][A-Za-z0-9_\-.]*)?(\/[A-Za-z0-9_][A-Za-z0-9_\-.]*)*/,
     logic_literal: _ => choice('true', 'false'),
 
     //#region Numbers

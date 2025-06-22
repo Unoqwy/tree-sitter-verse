@@ -83,10 +83,21 @@ Float suffix
     (number_suffix)))
 
 ===============================
-Path literal
+Basic path literal
 ===============================
 
 /Github.com/Ghost
+
+---
+
+(source_file
+  (path_literal))
+
+===============================
+@ path literal
+===============================
+
+/Ghost@Github.com/Ghost
 
 ---
 
