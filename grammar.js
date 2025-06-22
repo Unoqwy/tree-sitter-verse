@@ -384,7 +384,7 @@ module.exports = grammar({
         field('rhs', $._inline_body),
       )),
     of_expression: $ =>
-      prec.left(PREC.of, seq(
+      prec.right(PREC.of, seq(
         field('lhs', $._expr),
         'of',
         field('rhs', $._expr),

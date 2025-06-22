@@ -1921,7 +1921,7 @@
       }
     },
     "of_expression": {
-      "type": "PREC_LEFT",
+      "type": "PREC_RIGHT",
       "value": 10,
       "content": {
         "type": "SEQ",

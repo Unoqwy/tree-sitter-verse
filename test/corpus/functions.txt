@@ -224,6 +224,21 @@ Some of true
     rhs: (logic_literal)))
 
 ===============================
+'of' call chaining
+===============================
+
+A of B of true
+
+---
+
+(source_file
+  (of_expression
+    lhs: (identifier)
+    rhs: (of_expression
+      lhs: (identifier)
+      rhs: (logic_literal))))
+
+===============================
 'of' call expression with parens
 ===============================
 
