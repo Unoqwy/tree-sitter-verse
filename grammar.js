@@ -13,6 +13,9 @@
   * @type {Object.<string, number>}
   */
 const PREC = {
+  named_unary: 10,
+  range: 10,
+  thin_arrow: 10,
   fat_arrow: 10,
   to: 10,
   of: 10,
@@ -27,6 +30,7 @@ const PREC = {
   and: 3,
   or: 2,
   decl: 1,
+  where: -1,
 };
 
 module.exports = grammar({
@@ -101,6 +105,7 @@ module.exports = grammar({
         repeat1(prec.left(seq(
           '@', $._expr,
         ))),
+        optional($._auto_terminator),
       )),
 
     comma_separated_group: $ =>
@@ -145,8 +150,13 @@ module.exports = grammar({
 
       $.unary_expression,
       $.binary_expression,
+
+      $.thin_arrow_expression,
+      $.range_expression,
       $.fat_arrow_expression,
       $.of_expression,
+      $.to_expression,
+      $.where_expression,
     ),
     //#endregion
 
@@ -352,22 +362,28 @@ module.exports = grammar({
     //#endregion
 
     //#region Operators
+    field_expression: $ =>
+      prec.left(PREC.decl, seq(
+        field('target', $._stdexpr),
+        token.immediate('.'),
+        field('field', $._stdexpr),
+      )),
+
     binary_expression: $ => {
       /** @type [string, number][] */
       const binary_table = [
-        ['*'  , PREC.mult],
-        ['/'  , PREC.mult],
-        ['+'  , PREC.add ],
-        ['-'  , PREC.add ],
-        ['='  , PREC.eq  ],
-        ['<>' , PREC.eq  ],
-        ['<'  , PREC.cmp ],
-        ['>'  , PREC.cmp ],
-        ['<=' , PREC.cmp ],
-        ['>=' , PREC.cmp ],
-        ['and', PREC.and ],
-        ['or' , PREC.or  ],
-        ['to' , PREC.to  ],
+        ['*'  , PREC.mult]
+      , ['/'  , PREC.mult]
+      , ['+'  , PREC.add ]
+      , ['-'  , PREC.add ]
+      , ['='  , PREC.eq  ]
+      , ['<>' , PREC.eq  ]
+      , ['<'  , PREC.cmp ]
+      , ['>'  , PREC.cmp ]
+      , ['<=' , PREC.cmp ]
+      , ['>=' , PREC.cmp ]
+      , ['and', PREC.and ]
+      , ['or' , PREC.or  ]
       ];
       return choice(...binary_table.map(
         ([op, pval]) => prec.left(pval, seq(
@@ -377,33 +393,28 @@ module.exports = grammar({
          )),
       ));
     },
+
+    thin_arrow_expression: $ =>
+      binary_rule($, "->", PREC.thin_arrow),
+    range_expression: $ =>
+      binary_rule($, "..", PREC.range),
     fat_arrow_expression: $ =>
-      prec.left(PREC.fat_arrow, seq(
-        field('lhs', $._expr),
-        '=>',
-        field('rhs', $._inline_body),
-      )),
+      binary_rule($, "=>", PREC.fat_arrow, "left", $._inline_body),
     of_expression: $ =>
-      prec.right(PREC.of, seq(
-        field('lhs', $._expr),
-        'of',
-        field('rhs', $._expr),
-      )),
-    field_expression: $ =>
-      prec.left(PREC.decl, seq(
-        field('target', $._stdexpr),
-        token.immediate('.'),
-        field('field', $._stdexpr),
-      )),
+      binary_rule($, "of", PREC.fat_arrow, "right"),
+    to_expression: $ =>
+      binary_rule($, "to", PREC.to),
+    where_expression: $ =>
+      binary_rule($, "where", PREC.where),
 
     unary_expression: $ => {
       /** @type [string, number][] */
       const prefix_table = [
-        ['?'  , PREC.opt ],
-        ['not', PREC.not ],
-        ['+'  , PREC.sign],
-        ['-'  , PREC.sign],
-        [':', PREC.query],
+        ['?'  , PREC.opt ]
+      , ['not', PREC.not ]
+      , ['+'  , PREC.sign]
+      , ['-'  , PREC.sign]
+      , [':', PREC.query]
       ];
       /** @type [string, number][] */
       const suffix_table = [
@@ -466,14 +477,40 @@ function separated1(separator, rule, trail) {
   return seq(...rules);
 }
 
-/** Creates a named unary expression rule.
+/**
+  * Creates a named unary expression rule.
   * @param {GrammarSymbols<any>} $
   * @param {string} keyword
+  * @return {Rule}
   */
 function named_unary($, keyword) {
-  return prec.left(10, seq(
+  return prec.left(PREC.named_unary, seq(
     keyword,
     optional($._expr),
   ));
+}
+
+/**
+  * Creates a non-named binary expression rule.
+  * @param {GrammarSymbols<any>} $
+  * @param {string} op
+  * @param {number} pval Precedence
+  * @param {"left"|"right"} dir Precedence direction
+  * @param {Rule|undefined} rhs Right hand side rule override
+  * @return {Rule}
+  */
+function binary_rule($, op, pval, dir="left", rhs=undefined) {
+  const rule = seq(
+    field('lhs', $._expr),
+    op,
+    field('rhs', rhs !== undefined ? rhs : $._expr),
+  );
+  if (dir == "left") {
+    return prec.left(pval, rule);
+  } else if (dir == "right") {
+    return prec.right(pval, rule);
+  } else {
+    throw new Error("dir must be 'left' or 'right'");
+  }
 }
 

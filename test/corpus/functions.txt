@@ -273,3 +273,21 @@ Some of array{1}
       (block
         (integer)))))
 
+===============================
+Function extension
+===============================
+
+(__:int).Ext():void = {}
+
+---
+
+(source_file
+  (function_declaration
+    name: (field_expression
+      target: (declaration
+        lhs: (identifier)
+        type_hint: (identifier))
+      field: (identifier))
+    ret_type: (identifier)
+    (block)))
+

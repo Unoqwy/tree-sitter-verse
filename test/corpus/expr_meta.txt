@@ -78,6 +78,27 @@ Parenthesized several attributes
     rhs: (integer)))
 
 ===============================
+@attribute followed by function extension
+===============================
+
+@attr
+(__:int).Ext():void = {}
+
+---
+
+(source_file
+  (function_declaration
+    pre_attributes: (at_attributes
+      (identifier))
+    name: (field_expression
+      target: (declaration
+        lhs: (identifier)
+        type_hint: (identifier))
+      field: (identifier))
+    ret_type: (identifier)
+    (block)))
+
+===============================
 Comma separated group
 ===============================
 

@@ -56,6 +56,29 @@ class (supertype) {}
     (block)))
 
 ===============================
+Archetype curly block
+===============================
+
+some_type{
+  Field1 := true
+  Field2: int = 0
+}
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (declaration
+        lhs: (identifier)
+        rhs: (logic_literal))
+      (declaration
+        lhs: (identifier)
+        type_hint: (identifier)
+        rhs: (integer)))))
+
+===============================
 Macro call parameters
 ===============================
 
