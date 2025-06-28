@@ -207,7 +207,11 @@ module.exports = grammar({
         $._incomplete_string
       ),
     ),
-    string_fragment: _ => token.immediate(prec(1, /([^"{\n\\]|\\")+/)),
+    escape_sequence: _ => token.immediate(/\\./),
+    string_fragment: $ => prec.right(repeat1(choice(
+      token.immediate(prec(1, /[^"{\n\\]+/)),
+      $.escape_sequence,
+    ))),
     string_template: $ => seq(
       token.immediate('{'),
       $._expr,

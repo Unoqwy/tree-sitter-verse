@@ -43,9 +43,13 @@ String quote escaping
 
 (source_file
   (string
-    (string_fragment))
+    (string_fragment
+      (escape_sequence)
+      (escape_sequence)))
   (string
-    (string_fragment)))
+    (string_fragment
+      (escape_sequence)
+      (escape_sequence))))
 
 ===============================
 Singleline comment format in strings
@@ -85,4 +89,47 @@ Incomplete strings
   (integer)
   (string
     (string_fragment)))
+
+===============================
+String templates
+===============================
+
+"Before {1}"
+"{1}"
+"{1} Start"
+"Before {1} After"
+
+---
+
+(source_file
+  (string
+    (string_fragment)
+    (string_template
+      (integer)))
+  (string
+    (string_template
+      (integer)))
+  (string
+    (string_template
+      (integer))
+    (string_fragment))
+  (string
+    (string_fragment)
+    (string_template
+      (integer))
+    (string_fragment)))
+
+===============================
+\{ in strings
+===============================
+
+"Escaped \{1\} test"
+
+---
+
+(source_file
+  (string
+    (string_fragment
+      (escape_sequence)
+      (escape_sequence))))
 

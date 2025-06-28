@@ -5456,6 +5456,21 @@
     }
   },
   {
+    "type": "string_fragment",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "escape_sequence",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "string_template",
     "named": true,
     "fields": {
@@ -6986,6 +7001,10 @@
     "named": true
   },
   {
+    "type": "escape_sequence",
+    "named": true
+  },
+  {
     "type": "false",
     "named": false
   },
@@ -7020,10 +7039,6 @@
   {
     "type": "set",
     "named": false
-  },
-  {
-    "type": "string_fragment",
-    "named": true
   },
   {
     "type": "to",
