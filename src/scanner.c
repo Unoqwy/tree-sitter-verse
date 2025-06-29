@@ -2,11 +2,14 @@
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/array.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <ctype.h>
 
 enum TokenType {
     AUTO_TERMINATOR,
+    BLOCK_COMMENT_CONTENT,
+    INDENT_COMMENT_CONTENT,
     OPEN_BRACED_BLOCK,
     OPEN_INDENT_BLOCK,
     OPEN_INDENT_BLOCK_COLON,
@@ -130,6 +133,84 @@ static bool scan_auto_terminator(
     return false;
 }
 
+static bool scan_block_comment_content(TSLexer *lexer) {
+    uint16_t nest_level = 1;
+
+    while (!lexer->eof(lexer)) {
+        if (lexer->lookahead == '<') {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == '#') {
+                nest_level += 1;
+            }
+        } else if (lexer->lookahead == '#') {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == '>') {
+                nest_level -= 1;
+            }
+        }
+
+        lexer->advance(lexer, false);
+        if (nest_level == 0) {
+            break;
+        }
+    }
+
+    lexer->mark_end(lexer);
+    return true;
+}
+
+static bool scan_indent_comment_content(
+    TSLexer *lexer,
+    Scanner *scanner
+) {
+    uint16_t outer_indent_len;
+    if (scanner->indents.size > 0) {
+        outer_indent_len = *array_back(&scanner->indents);
+    } else {
+        outer_indent_len = 0;
+    }
+
+    uint16_t indent_len = 0;
+    bool met_newline = false;
+    bool line_start = false;
+    for (;;) {
+        if (lexer->eof(lexer)) {
+            if (!line_start) {
+                lexer->mark_end(lexer);
+            }
+            break;
+        }
+
+        if (line_start) {
+            if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                indent_len += 1;
+                lexer->advance(lexer, true);
+                continue;
+            } else if (lexer->lookahead == '\n') {
+                indent_len = 0;
+                lexer->advance(lexer, true);
+                continue;
+            } else {
+                line_start = false;
+            }
+        }
+        if (lexer->lookahead == '\n') {
+            lexer->mark_end(lexer);
+            if (!met_newline) {
+                met_newline = true;
+            }
+            line_start = true;
+            indent_len = 0;
+        } else if (!met_newline || indent_len > outer_indent_len) {
+            lexer->advance(lexer, false);
+        } else {
+            break;
+        }
+    }
+
+    return true;
+}
+
 bool tree_sitter_verse_external_scanner_scan(
     void *payload,
     TSLexer *lexer,
@@ -153,6 +234,15 @@ bool tree_sitter_verse_external_scanner_scan(
         lexer->result_symbol = INCOMPLETE_STRING;
         return true;
     }
+
+    if (valid_symbols[BLOCK_COMMENT_CONTENT] && !error_recovery) {
+        lexer->result_symbol = BLOCK_COMMENT_CONTENT;
+        return scan_block_comment_content(lexer);
+    } else if (valid_symbols[INDENT_COMMENT_CONTENT] && !error_recovery) {
+        lexer->result_symbol = INDENT_COMMENT_CONTENT;
+        return scan_indent_comment_content(lexer, scanner);
+    }
+
     if (valid_symbols[AUTO_TERMINATOR]
             && scanner->indent_block_close > 0
             && !valid_symbols[INDENT]
@@ -182,7 +272,7 @@ bool tree_sitter_verse_external_scanner_scan(
     uint16_t indent_len = 0;
     bool check_other_lines = valid_symbols[OPEN_BRACED_BLOCK] || valid_symbols[INDENT];
     for (;;) {
-        if (lexer->lookahead == ' ') {
+        if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
             indent_len += 1;
             lexer->advance(lexer, true);
         } else if (lexer->lookahead == '\n') {
@@ -274,6 +364,11 @@ bool tree_sitter_verse_external_scanner_scan(
             lexer->advance(lexer, false);
             cursor += 1;
             switch (lexer->lookahead) {
+                case '#':
+                    if (cursor == 1) {
+                        return false;
+                    }
+                    break;
                 case ' ':
                     break;
                 case '\n':

@@ -1116,6 +1116,11 @@
     }
   },
   {
+    "type": "block_comment",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "break_expression",
     "named": true,
     "fields": {
@@ -3414,6 +3419,11 @@
     }
   },
   {
+    "type": "indent_comment",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "integer",
     "named": true,
     "fields": {},
@@ -3427,6 +3437,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "line_comment",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "logic_literal",
@@ -6936,6 +6951,14 @@
     "named": false
   },
   {
+    "type": "<#",
+    "named": false
+  },
+  {
+    "type": "<#>",
+    "named": false
+  },
+  {
     "type": "<=",
     "named": false
   },
@@ -6986,11 +7009,6 @@
   {
     "type": "char",
     "named": true
-  },
-  {
-    "type": "comment",
-    "named": true,
-    "extra": true
   },
   {
     "type": "continue",

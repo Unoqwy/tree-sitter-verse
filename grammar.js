@@ -33,11 +33,19 @@ const PREC = {
   where: -1,
 };
 
+const CONTENT_PREC = {
+  string: 2,
+  indent_comment: 1,
+  comment: 0,
+};
+
 module.exports = grammar({
   name: "verse",
 
   externals: $ => [
     $._auto_terminator,
+    $._block_comment_content,
+    $._indent_comment_content,
     '{',
     $._open_indent_block,
     "macro:",
@@ -58,11 +66,22 @@ module.exports = grammar({
     [$.macro_call],
   ],
 
-  extras: $ => [/\s+/, $.comment],
+  extras: $ => [/\s+/, $.line_comment, $.block_comment, $.indent_comment],
 
   rules: {
     source_file: $ => repeat($._complete_expr),
-    comment: _ => token(seq('#', /.*/)),
+
+    //#region Comments
+    line_comment: _ => prec(CONTENT_PREC.comment, token(seq('#', /.*/))),
+    block_comment: $ => prec(CONTENT_PREC.comment, seq(
+      '<#',
+      $._block_comment_content,
+    )),
+    indent_comment: $ => prec(CONTENT_PREC.indent_comment, seq(
+      '<#>', // TODO : limit to line start
+      $._indent_comment_content,
+    )),
+    //#endregion
 
     _complete_expr: $ => seq(
       $._expr,
@@ -209,7 +228,7 @@ module.exports = grammar({
     ),
     escape_sequence: _ => token.immediate(/\\./),
     string_fragment: $ => prec.right(repeat1(choice(
-      token.immediate(prec(1, /[^"{\n\\]+/)),
+      token.immediate(prec(CONTENT_PREC.string, /[^"{\n\\]+/)),
       $.escape_sequence,
     ))),
     string_template: $ => seq(

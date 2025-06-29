@@ -203,6 +203,25 @@ block:
   (integer))
 
 ===============================
+Basic indent block exit with Tab
+===============================
+
+block:
+	0
+	1
+2
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (integer)))
+  (integer))
+
+===============================
 Nested indent block
 ===============================
 
@@ -214,6 +233,35 @@ block:
       2
 
   3
+
+---
+
+(source_file
+  (macro_call
+    macro: (identifier)
+    (block
+      (integer)
+      (macro_call
+        macro: (identifier)
+        (block
+          (macro_call
+            macro: (identifier)
+            (block
+              (integer)))))
+      (integer))))
+
+===============================
+Nested indent block with Tab
+===============================
+
+block:
+	1
+
+	block:
+		block:
+			2
+
+	3
 
 ---
 

@@ -9,18 +9,56 @@
         "name": "_complete_expr"
       }
     },
-    "comment": {
-      "type": "TOKEN",
+    "line_comment": {
+      "type": "PREC",
+      "value": 0,
+      "content": {
+        "type": "TOKEN",
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "#"
+            },
+            {
+              "type": "PATTERN",
+              "value": ".*"
+            }
+          ]
+        }
+      }
+    },
+    "block_comment": {
+      "type": "PREC",
+      "value": 0,
       "content": {
         "type": "SEQ",
         "members": [
           {
             "type": "STRING",
-            "value": "#"
+            "value": "<#"
           },
           {
-            "type": "PATTERN",
-            "value": ".*"
+            "type": "SYMBOL",
+            "name": "_block_comment_content"
+          }
+        ]
+      }
+    },
+    "indent_comment": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "<#>"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_indent_comment_content"
           }
         ]
       }
@@ -623,7 +661,7 @@
               "type": "IMMEDIATE_TOKEN",
               "content": {
                 "type": "PREC",
-                "value": 1,
+                "value": 2,
                 "content": {
                   "type": "PATTERN",
                   "value": "[^\"{\\n\\\\]+"
@@ -2278,7 +2316,15 @@
     },
     {
       "type": "SYMBOL",
-      "name": "comment"
+      "name": "line_comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "block_comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "indent_comment"
     }
   ],
   "conflicts": [
@@ -2302,6 +2348,14 @@
     {
       "type": "SYMBOL",
       "name": "_auto_terminator"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_block_comment_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_indent_comment_content"
     },
     {
       "type": "STRING",
