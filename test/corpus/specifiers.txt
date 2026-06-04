@@ -1,0 +1,93 @@
+================================================================================
+Effect specifiers on function
+================================================================================
+
+F()<transacts><decides>:void = DoWork()
+
+---
+
+(source_file
+  (function_definition
+    signature: (decorated_expression
+      operand: (call_expression
+        function: (identifier))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))
+        (specifier
+          name: (identifier))))
+    return_type: (identifier)
+    body: (call_expression
+      function: (identifier))))
+
+================================================================================
+Class with specifiers on keyword
+================================================================================
+
+C := class<abstract> {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)))
+      (braced_block))))
+
+================================================================================
+Multiple specifiers on keyword
+================================================================================
+
+C := class<final><persistable> {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))
+        (specifier
+          name: (identifier)))
+      (braced_block))))
+
+================================================================================
+Struct with specifiers
+================================================================================
+
+S := struct<persistable> {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (struct_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)))
+      (braced_block))))
+
+================================================================================
+Scoped specifier
+================================================================================
+
+C := class<scoped{ModuleA, ModuleB}> {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)
+          (identifier)
+          (identifier)))
+      (braced_block))))

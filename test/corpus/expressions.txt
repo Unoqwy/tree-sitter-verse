@@ -1,0 +1,357 @@
+================================================================================
+Arithmetic expressions
+================================================================================
+
+A + B
+A - B
+A * B
+A / B
+
+---
+
+(source_file
+  (binary_expression
+    left: (identifier)
+    right: (identifier))
+  (binary_expression
+    left: (identifier)
+    right: (identifier))
+  (binary_expression
+    left: (identifier)
+    right: (identifier))
+  (binary_expression
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Arithmetic precedence
+================================================================================
+
+A + B * C
+A * B + C
+
+---
+
+(source_file
+  (binary_expression
+    left: (identifier)
+    right: (binary_expression
+      left: (identifier)
+      right: (identifier)))
+  (binary_expression
+    left: (binary_expression
+      left: (identifier)
+      right: (identifier))
+    right: (identifier)))
+
+================================================================================
+Comparison operators
+================================================================================
+
+A = B
+A <> B
+A <= B
+A >= B
+
+---
+
+(source_file
+  (comparison_expression
+    left: (identifier)
+    right: (identifier))
+  (comparison_expression
+    left: (identifier)
+    right: (identifier))
+  (comparison_expression
+    left: (identifier)
+    right: (identifier))
+  (comparison_expression
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Logical operators
+================================================================================
+
+A and B
+A or B
+A and B or C
+
+---
+
+(source_file
+  (binary_expression
+    left: (identifier)
+    right: (identifier))
+  (binary_expression
+    left: (identifier)
+    right: (identifier))
+  (binary_expression
+    left: (binary_expression
+      left: (identifier)
+      right: (identifier))
+    right: (identifier)))
+
+================================================================================
+Unary expressions
+================================================================================
+
+-X
++X
+not Condition
+
+---
+
+(source_file
+  (binary_expression
+    left: (unary_expression
+      operand: (identifier))
+    right: (identifier))
+  (unary_expression
+    operand: (identifier)))
+
+================================================================================
+Assignment expression
+================================================================================
+
+X := 42
+X := Y + 1
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (assignment_expression
+    left: (identifier)
+    right: (binary_expression
+      left: (identifier)
+      right: (integer_literal))))
+
+================================================================================
+Type annotation
+================================================================================
+
+X:int
+Y:float
+
+---
+
+(source_file
+  (type_annotation
+    value: (identifier)
+    type: (identifier))
+  (type_annotation
+    value: (identifier)
+    type: (identifier)))
+
+================================================================================
+Member access
+================================================================================
+
+Player.Health
+Config.Settings.MaxPlayers
+
+---
+
+(source_file
+  (member_expression
+    object: (identifier)
+    member: (identifier))
+  (member_expression
+    object: (member_expression
+      object: (identifier)
+      member: (identifier))
+    member: (identifier)))
+
+================================================================================
+Function calls
+================================================================================
+
+Print()
+Add(1, 2)
+Math.Sqrt(16.0)
+
+---
+
+(source_file
+  (call_expression
+    function: (identifier))
+  (call_expression
+    function: (identifier)
+    arguments: (argument_list
+      (argument
+        (integer_literal))
+      (argument
+        (integer_literal))))
+  (call_expression
+    function: (member_expression
+      object: (identifier)
+      member: (identifier))
+    arguments: (argument_list
+      (argument
+        (float_literal)))))
+
+================================================================================
+Subscript expressions
+================================================================================
+
+MyArray[0]
+MyMap[Key]
+
+---
+
+(source_file
+  (subscript_expression
+    object: (identifier)
+    arguments: (argument_list
+      (argument
+        (integer_literal))))
+  (subscript_expression
+    object: (identifier)
+    arguments: (argument_list
+      (argument
+        (identifier)))))
+
+================================================================================
+Postfix query and deref
+================================================================================
+
+Value?
+Ptr^
+
+---
+
+(source_file
+  (postfix_query
+    operand: (identifier))
+  (postfix_deref
+    operand: (identifier)))
+
+================================================================================
+Range expression
+================================================================================
+
+0..100
+A to B
+
+---
+
+(source_file
+  (binary_expression
+    left: (integer_literal)
+    right: (integer_literal))
+  (binary_expression
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Parenthesized expressions
+================================================================================
+
+(A + B) * C
+(X)
+
+---
+
+(source_file
+  (binary_expression
+    left: (parenthesized_expression
+      (binary_expression
+        left: (identifier)
+        right: (identifier)))
+    right: (identifier))
+  (parenthesized_expression
+    (identifier)))
+
+================================================================================
+Lambda/arrow expression
+================================================================================
+
+X => X + 1
+
+---
+
+(source_file
+  (binary_expression
+    left: (identifier)
+    right: (binary_expression
+      left: (identifier)
+      right: (integer_literal))))
+
+================================================================================
+Compound assignment
+================================================================================
+
+X += 1
+X -= 2
+X *= 3
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal)))
+
+================================================================================
+Set expression
+================================================================================
+
+set X = 100
+set X += 50
+
+---
+
+(source_file
+  (set_expression
+    target: (identifier)
+    value: (integer_literal))
+  (set_expression
+    target: (identifier)
+    value: (integer_literal)))
+
+================================================================================
+Where clause
+================================================================================
+
+X where X = 5
+
+---
+
+(source_file
+  (binary_expression
+    left: (identifier)
+    right: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))))
+
+================================================================================
+Named arguments
+================================================================================
+
+Greet(?Name := Alice, ?Level := 5)
+
+---
+
+(source_file
+  (call_expression
+    function: (identifier)
+    arguments: (argument_list
+      (argument
+        (assignment_expression
+          left: (optional_type
+            (identifier))
+          right: (identifier)))
+      (argument
+        (assignment_expression
+          left: (optional_type
+            (identifier))
+          right: (integer_literal))))))

@@ -1,0 +1,379 @@
+================================================================================
+Bare-indent function body
+================================================================================
+
+fac(x:int):int=
+    if (x <= 1) { return 1 }
+    return x * fac(x - 1)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (call_expression
+      (identifier)
+      (argument_list
+        (argument
+          (type_annotation
+            (identifier)
+            (identifier)))))
+    (identifier)
+    (block_indent
+      (if_expression
+        (comparison_expression
+          (identifier)
+          (integer_literal))
+        (braced_block
+          (return_expression
+            (integer_literal))))
+      (binary_expression
+        (return_expression
+          (identifier))
+        (call_expression
+          (identifier)
+          (argument_list
+            (argument
+              (binary_expression
+                (identifier)
+                (integer_literal)))))))))
+
+================================================================================
+Macro colon block (assert)
+================================================================================
+
+assert:
+    X := 1
+    Y := 2
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_block
+    (identifier)
+    (indented_block
+      (assignment_expression
+        (identifier)
+        (integer_literal))
+      (assignment_expression
+        (identifier)
+        (integer_literal)))))
+
+================================================================================
+Macro colon block with call head
+================================================================================
+
+assert_semantic_error(1000):
+    Run():void =
+        var N:int = 0
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_block
+    (call_expression
+      (identifier)
+      (argument_list
+        (argument
+          (integer_literal))))
+    (indented_block
+      (function_definition
+        (call_expression
+          (identifier))
+        (identifier)
+        (block_indent
+          (var_definition
+            (identifier)
+            (identifier)
+            (integer_literal)))))))
+
+================================================================================
+verse_vm_only braced with inner colon macros
+================================================================================
+
+verse_vm_only {
+assert:
+    set live X = Y
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (archetype_instantiation
+    (identifier)
+    (macro_block
+      (identifier)
+      (indented_block
+        (set_expression
+          (live_binding
+            (identifier))
+          (identifier))))))
+
+================================================================================
+Var inferred type
+================================================================================
+
+var M := map{}
+var Health:float = 100.0
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (var_definition
+    (identifier)
+    (map_literal))
+  (var_definition
+    (identifier)
+    (identifier)
+    (float_literal)))
+
+================================================================================
+Var with specifier after name
+================================================================================
+
+var X<public>:int = 2
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (var_definition
+    (decorated_expression
+      (identifier)
+      (specifier_list
+        (specifier
+          (identifier))))
+    (identifier)
+    (integer_literal)))
+
+================================================================================
+Live binding without var
+================================================================================
+
+live Y:int = X.Length
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (comparison_expression
+    (live_binding
+      (type_annotation
+        (identifier)
+        (identifier)))
+    (member_expression
+      (identifier)
+      (identifier))))
+
+================================================================================
+Struct and interface with supertype
+================================================================================
+
+S := struct(Object) {}
+T := interface(I1) {}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (struct_expression
+      (supertype_clause
+        (identifier))
+      (braced_block)))
+  (assignment_expression
+    (identifier)
+    (interface_expression
+      (supertype_clause
+        (identifier))
+      (braced_block))))
+
+================================================================================
+Class with specifier and empty supertype
+================================================================================
+
+base := class<castable>(){}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (class_expression
+      (specifier_list
+        (specifier
+          (identifier)))
+      (supertype_clause)
+      (braced_block))))
+
+================================================================================
+Less-than comparison without spaces
+================================================================================
+
+x := if (a<b) {b} else {a}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (if_expression
+      (comparison_expression
+        (identifier)
+        (identifier))
+      (braced_block
+        (identifier))
+      (braced_block
+        (identifier)))))
+
+================================================================================
+Address-of prefix operator
+================================================================================
+
+p := &value
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (unary_expression
+      (identifier))))
+
+================================================================================
+Annotation with arguments
+================================================================================
+
+E := enum:
+    @doc("value")
+    A
+    B
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (enum_expression
+      (indented_block
+        (annotation
+          (identifier)
+          (argument_list
+            (argument
+              (string))))
+        (identifier)
+        (identifier)))))
+
+================================================================================
+Enum comma-separated colon body
+================================================================================
+
+Color := enum:
+    Red, Green, Blue
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (enum_expression
+      (indented_block
+        (identifier)
+        (identifier)
+        (identifier)))))
+
+================================================================================
+Qualified member access
+================================================================================
+
+x := tA.(typeA:)Func()
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (call_expression
+      (member_expression
+        (identifier)
+        (qualified_access
+          (parenthesized_expression
+            (type_annotation
+              (identifier)))
+          (identifier))))))
+
+================================================================================
+Inline if-then without else
+================================================================================
+
+y := if (a < b) then c
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (if_expression
+      (comparison_expression
+        (identifier)
+        (identifier))
+      (identifier))))
+
+================================================================================
+Function with array return type
+================================================================================
+
+GetItems():[]int = array{1, 2, 3}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (call_expression
+      (identifier))
+    (array_type
+      (identifier))
+    (array_literal
+      (integer_literal)
+      (integer_literal)
+      (integer_literal))))
+
+================================================================================
+Function with optional return type
+================================================================================
+
+Find():?int = false
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (call_expression
+      (identifier))
+    (optional_type
+      (identifier))
+    (boolean_literal)))
+
+================================================================================
+Function with map and tuple return types
+================================================================================
+
+AsMap():[string]int = map{}
+AsPair():tuple(int, int) = (1, 2)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (call_expression
+      (identifier))
+    (map_type
+      (identifier)
+      (identifier))
+    (map_literal))
+  (function_definition
+    (call_expression
+      (identifier))
+    (tuple_expression
+      (identifier)
+      (identifier))
+    (parenthesized_expression
+      (integer_literal)
+      (integer_literal))))

@@ -1,0 +1,396 @@
+================================================================================
+Chained member access
+================================================================================
+
+Game.Players[0].Inventory.Items[0].Name
+
+---
+
+(source_file
+  (member_expression
+    object: (subscript_expression
+      object: (member_expression
+        object: (member_expression
+          object: (subscript_expression
+            object: (member_expression
+              object: (identifier)
+              member: (identifier))
+            arguments: (argument_list
+              (argument
+                (integer_literal))))
+          member: (identifier))
+        member: (identifier))
+      arguments: (argument_list
+        (argument
+          (integer_literal))))
+    member: (identifier)))
+
+================================================================================
+Negative integer literal
+================================================================================
+
+X := -42
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (unary_expression
+      operand: (integer_literal))))
+
+================================================================================
+Hex literal
+================================================================================
+
+X := 0xDEADBEEF
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal)))
+
+================================================================================
+Multiple using statements
+================================================================================
+
+using { /Verse.org/Verse }
+using { /Fortnite.com/Devices }
+
+---
+
+(source_file
+  (using_statement
+    (path_literal))
+  (using_statement
+    (path_literal)))
+
+================================================================================
+Empty class
+================================================================================
+
+C := class {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block))))
+
+================================================================================
+Class with inheritance and interface
+================================================================================
+
+D := class(Base, IDrawable) {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      supertypes: (supertype_clause
+        (identifier)
+        (identifier))
+      (braced_block))))
+
+================================================================================
+Enum with case expression
+================================================================================
+
+case(Dir) { direction.North => 1; direction.South => 2 }
+
+---
+
+(source_file
+  (case_expression
+    value: (identifier)
+    (braced_block
+      (binary_expression
+        left: (member_expression
+          object: (identifier)
+          member: (identifier))
+        right: (integer_literal))
+      (binary_expression
+        left: (member_expression
+          object: (identifier)
+          member: (identifier))
+        right: (integer_literal)))))
+
+================================================================================
+Var with specifier
+================================================================================
+
+var<private> X:int = 0
+
+---
+
+(source_file
+  (var_definition
+    specifiers: (specifier_list
+      (specifier
+        name: (identifier)))
+    name: (identifier)
+    type: (identifier)
+    value: (integer_literal)))
+
+================================================================================
+Var live
+================================================================================
+
+var live Health:int = 100
+
+---
+
+(source_file
+  (var_definition
+    name: (identifier)
+    type: (identifier)
+    value: (integer_literal)))
+
+================================================================================
+Dot block expression
+================================================================================
+
+if (X). Print(X)
+
+---
+
+(source_file
+  (call_expression
+    function: (if_expression
+      condition: (identifier)
+      (dot_block
+        (identifier)))
+    arguments: (argument_list
+      (argument
+        (identifier)))))
+
+================================================================================
+Comparison operators including < and >
+================================================================================
+
+A < B
+A > B
+A <= B
+A >= B
+
+---
+
+(source_file
+  (comparison_expression
+    left: (identifier)
+    right: (identifier))
+  (comparison_expression
+    left: (identifier)
+    right: (identifier))
+  (comparison_expression
+    left: (identifier)
+    right: (identifier))
+  (comparison_expression
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Archetype with semicolons
+================================================================================
+
+P := Point{X := 10; Y := 20}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (archetype_instantiation
+      type: (identifier)
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Option and false
+================================================================================
+
+X:?int = option{42}
+Y:?int = false
+
+---
+
+(source_file
+  (comparison_expression
+    left: (type_annotation
+      value: (identifier)
+      type: (optional_type
+        (identifier)))
+    right: (option_literal
+      (integer_literal)))
+  (comparison_expression
+    left: (type_annotation
+      value: (identifier)
+      type: (optional_type
+        (identifier)))
+    right: (boolean_literal)))
+
+================================================================================
+Map literal
+================================================================================
+
+Scores := map{"Alice" => 100, "Bob" => 85}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (map_literal
+      (map_entry
+        key: (string)
+        value: (integer_literal))
+      (map_entry
+        key: (string)
+        value: (integer_literal)))))
+
+================================================================================
+Specifier with args
+================================================================================
+
+var X<getter(GetX)><setter(SetX)>:int = 0
+
+---
+
+(source_file
+  (var_definition
+    name: (decorated_expression
+      operand: (identifier)
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)
+          (identifier))
+        (specifier
+          name: (identifier)
+          (identifier))))
+    type: (identifier)
+    value: (integer_literal)))
+
+================================================================================
+Annotation before definition
+================================================================================
+
+@editable
+Damage:float = 10.0
+
+---
+
+(source_file
+  (annotation
+    name: (identifier))
+  (comparison_expression
+    left: (type_annotation
+      value: (identifier)
+      type: (identifier))
+    right: (float_literal)))
+
+================================================================================
+Multiline function call
+================================================================================
+
+Print(
+    "hello"
+)
+
+---
+
+(source_file
+  (call_expression
+    function: (identifier)
+    arguments: (argument_list
+      (argument
+        (string)))))
+
+================================================================================
+Set with compound operators
+================================================================================
+
+set X = 100
+set X += 50
+set X -= 25
+set X *= 2
+
+---
+
+(source_file
+  (set_expression
+    target: (identifier)
+    value: (integer_literal))
+  (set_expression
+    target: (identifier)
+    value: (integer_literal))
+  (set_expression
+    target: (identifier)
+    value: (integer_literal))
+  (set_expression
+    target: (identifier)
+    value: (integer_literal)))
+
+================================================================================
+Simple annotation
+================================================================================
+
+@editable
+
+---
+
+(source_file
+  (annotation
+    name: (identifier)))
+
+================================================================================
+Annotation with braced body
+================================================================================
+
+@available { MinVersion := 3800 }
+
+---
+
+(source_file
+  (annotation
+    name: (identifier)
+    (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Line comment
+================================================================================
+
+# This is a comment
+42
+
+---
+
+(source_file
+  (line_comment)
+  (integer_literal))
+
+================================================================================
+Inline comment
+================================================================================
+
+X := 42 # inline comment
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (line_comment))

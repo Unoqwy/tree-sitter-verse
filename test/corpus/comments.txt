@@ -1,139 +1,277 @@
-===============================
-Line comment
-===============================
+================================================================================
+Line comment standalone
+================================================================================
 
-# Hello World
-0# Hello
-1
+# this is a comment
+
+---
+
+(source_file
+  (line_comment))
+
+================================================================================
+Line comment after code
+================================================================================
+
+X := 42 # inline comment
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (line_comment))
+
+================================================================================
+Block comment standalone
+================================================================================
+
+<# block comment #>
+
+---
+
+(source_file
+  (block_comment))
+
+================================================================================
+Block comment inline between expressions
+================================================================================
+
+X := <# mid #> 42
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    (block_comment)
+    right: (integer_literal)))
+
+================================================================================
+Block comment as expression separator
+================================================================================
+
+X := 1 <# separator #> + 2
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (binary_expression
+      left: (integer_literal)
+      (block_comment)
+      right: (integer_literal))))
+
+================================================================================
+Block comment spanning multiple lines
+================================================================================
+
+<# line 1
+line 2
+line 3 #>
+X := 42
+
+---
+
+(source_file
+  (block_comment)
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal)))
+
+================================================================================
+Empty block comment
+================================================================================
+
+<##>
+
+---
+
+(source_file
+  (block_comment))
+
+================================================================================
+Indent comment line
+================================================================================
+
+<#> this is an indent comment
+X := 42
+
+---
+
+(source_file
+  (block_comment)
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal)))
+
+================================================================================
+Comment inside string is string content
+================================================================================
+
+"abc<#comment#>def"
+
+---
+
+(source_file
+  (string))
+
+================================================================================
+Hash inside string is string content
+================================================================================
+
+"abc # not a comment"
+
+---
+
+(source_file
+  (string))
+
+================================================================================
+String inside line comment is ignored
+================================================================================
+
+# "not a string"
+X := 42
 
 ---
 
 (source_file
   (line_comment)
-  (integer)
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal)))
+
+================================================================================
+Comment before indent block
+================================================================================
+
+# comment
+block:
+    X := 1
+
+---
+
+(source_file
   (line_comment)
-  (integer))
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
 
-===============================
-Inline block comment
-===============================
+================================================================================
+Comment inside indent block
+================================================================================
 
-0<# in between #>+ 1
-
----
-
-(source_file
-  (binary_expression
-    (integer)
-    (block_comment)
-    (integer)))
-
-===============================
-Inline block comment with '#' inside
-===============================
-
-0<# # in > between # #>+ 1
+block:
+    # comment inside
+    X := 1
 
 ---
 
 (source_file
-  (binary_expression
-    (integer)
-    (block_comment)
-    (integer)))
+  (block_expression
+    (indented_block
+      (line_comment)
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
 
-===============================
-Multiline block comment
-===============================
+================================================================================
+Comment inside braced block
+================================================================================
 
-0<# in between
-on a couple
-lines #>+ 1
-
----
-
-(source_file
-  (binary_expression
-    (integer)
-    (block_comment)
-    (integer)))
-
-===============================
-Nested block comments
-===============================
-
-0<# in between
-on <# nested #> a couple
-lines #>+ 1
+block { # comment
+    X := 1
+}
 
 ---
 
 (source_file
-  (binary_expression
-    (integer)
-    (block_comment)
-    (integer)))
+  (block_expression
+    (braced_block
+      (line_comment)
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
 
-===============================
-Indent comment one line
-===============================
+================================================================================
+Comment at end of file
+================================================================================
 
-<#> One line
-1
-
----
-
-(source_file
-  (indent_comment)
-  (integer))
-
-===============================
-Indent comment one indented line
-===============================
-
-<#>
-  This is a one line story.
-2
+X := 42
+# end
 
 ---
 
 (source_file
-  (indent_comment)
-  (integer))
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (line_comment))
 
-===============================
-Indent comment multi-line
-===============================
+================================================================================
+Multiple consecutive comments
+================================================================================
 
-<#>
-  This is a multi line story.
-
-  Here goes something.
-
-  1
-2
-
----
-
-(source_file
-  (indent_comment)
-  (integer))
-
-===============================
-Indent comment multi-line with Tab
-===============================
-
-<#>
-	This is a multi line story.
-
-	Here goes something.
-
-	1
-2
+# first
+# second
+X := 42
+# third
 
 ---
 
 (source_file
-  (indent_comment)
-  (integer))
+  (line_comment)
+  (line_comment)
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (line_comment))
 
+================================================================================
+Block comment between function args
+================================================================================
+
+F(A <# first arg #>, B)
+
+---
+
+(source_file
+  (call_expression
+    function: (identifier)
+    arguments: (argument_list
+      (argument
+        (identifier))
+      (block_comment)
+      (argument
+        (identifier)))))
+
+================================================================================
+String with interpolation and comment after
+================================================================================
+
+"Hello {Name}" # greeting
+
+---
+
+(source_file
+  (string
+    (interpolation
+      (identifier)))
+  (line_comment))
+
+================================================================================
+Escape sequences are not comments
+================================================================================
+
+"\#not a comment"
+
+---
+
+(source_file
+  (string
+    (escape_sequence)))

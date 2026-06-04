@@ -1,0 +1,134 @@
+================================================================================
+Nested braces with blank lines
+================================================================================
+
+block {
+  1
+
+  block {
+    block {
+      2
+    }
+  }
+
+  3
+}
+
+---
+
+(source_file
+  (block_expression
+    (braced_block
+      (integer_literal)
+      (block_expression
+        (braced_block
+          (block_expression
+            (braced_block
+              (integer_literal)))))
+      (integer_literal))))
+
+================================================================================
+Indent block with semicolons
+================================================================================
+
+block:
+  0
+  1; 2
+  3
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (integer_literal)
+      (integer_literal)
+      (integer_literal)
+      (integer_literal))))
+
+================================================================================
+Indent block then dedent to top level
+================================================================================
+
+block:
+  0
+  1
+2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (integer_literal)
+      (integer_literal)))
+  (integer_literal))
+
+================================================================================
+Nested indent blocks with blank lines and sibling continuation
+================================================================================
+
+block:
+  1
+
+  block:
+    block:
+      2
+
+  3
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (integer_literal)
+      (block_expression
+        (indented_block
+          (block_expression
+            (indented_block
+              (integer_literal)))))
+      (integer_literal))))
+
+================================================================================
+Triple nested indent then full dedent to top
+================================================================================
+
+block:
+  block:
+    block:
+      1
+2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (block_expression
+        (indented_block
+          (block_expression
+            (indented_block
+              (integer_literal)))))))
+  (integer_literal))
+
+================================================================================
+Parenthesized block with mixed separators and newlines
+================================================================================
+
+(1
+
+2;3
+4
+
+   5)
+
+---
+
+(source_file
+  (parenthesized_expression
+    (integer_literal)
+    (integer_literal)
+    (integer_literal)
+    (integer_literal)
+    (integer_literal)))

@@ -1,370 +1,742 @@
-===============================
-'using' macro
-===============================
+================================================================================
+Braced block - empty
+================================================================================
 
-using { /Github.com/Ghost }
-
----
-
-(source_file
-  (macro_call
-    (identifier)
-    (block
-      (path_literal))))
-
-===============================
-'using' macro with dot form
-===============================
-
-using. /Github.com/Ghost
+block {}
 
 ---
 
 (source_file
-  (macro_call
-    (identifier)
-    (block
-      (path_literal))))
+  (block_expression
+    (braced_block)))
 
-===============================
-'option' macro
-===============================
+================================================================================
+Braced block - with semicolons
+================================================================================
 
-option{0}
+block { X := 1; Y := 2 }
 
 ---
 
 (source_file
-  (macro_call
-    (identifier)
-    (block
-      (integer))))
+  (block_expression
+    (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
 
-===============================
-Macro call parameter
-===============================
+================================================================================
+Braced block - with commas
+================================================================================
 
-class (supertype) {}
+block { X := 1, Y := 2 }
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
-      (identifier))
-    (block)))
+  (block_expression
+    (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
 
-===============================
-Archetype curly block
-===============================
+================================================================================
+Dot block
+================================================================================
 
-some_type{
-  Field1 := true
-  Field2: int = 0
+block. X + Y
+
+---
+
+(source_file
+  (binary_expression
+    left: (block_expression
+      (dot_block
+        (identifier)))
+    right: (identifier)))
+
+================================================================================
+Array literal
+================================================================================
+
+array{1, 2, 3}
+
+---
+
+(source_file
+  (array_literal
+    (integer_literal)
+    (integer_literal)
+    (integer_literal)))
+
+================================================================================
+Option literal
+================================================================================
+
+option{42}
+option{}
+
+---
+
+(source_file
+  (option_literal
+    (integer_literal))
+  (option_literal))
+
+================================================================================
+Archetype instantiation
+================================================================================
+
+Point{X := 10, Y := 20}
+
+---
+
+(source_file
+  (archetype_instantiation
+    type: (identifier)
+    (assignment_expression
+      left: (identifier)
+      right: (integer_literal))
+    (assignment_expression
+      left: (identifier)
+      right: (integer_literal))))
+
+================================================================================
+Three-level indent nesting
+================================================================================
+
+C := class:
+    F():int = block:
+        if (X > 0):
+            X
+        else:
+            0
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (block_expression
+            (indented_block
+              (if_expression
+                condition: (comparison_expression
+                  left: (identifier)
+                  right: (integer_literal))
+                (indented_block
+                  (identifier))
+                (indented_block
+                  (integer_literal))))))))))
+
+================================================================================
+Nested braces inside indent
+================================================================================
+
+C := class:
+    F():int = { block { X := 1; X } }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (braced_block
+            (block_expression
+              (braced_block
+                (assignment_expression
+                  left: (identifier)
+                  right: (integer_literal))
+                (identifier)))))))))
+
+================================================================================
+Multiple statements in indent block
+================================================================================
+
+block:
+    A := 1
+    B := 2
+    C := 3
+    D := 4
+    E := A + B + C + D
+    E
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (binary_expression
+          left: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier))
+          right: (identifier)))
+      (identifier))))
+
+================================================================================
+For loop inside class indent
+================================================================================
+
+C := class:
+    F():void = for (X : Items):
+        Print(X)
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (for_expression
+            clauses: (type_annotation
+              value: (identifier)
+              type: (identifier))
+            (indented_block
+              (call_expression
+                function: (identifier)
+                arguments: (argument_list
+                  (argument
+                    (identifier)))))))))))
+
+================================================================================
+Braced block with many semicolons
+================================================================================
+
+block { A := 1; B := 2; C := 3; A + B + C }
+
+---
+
+(source_file
+  (block_expression
+    (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (identifier)))))
+
+================================================================================
+Nested braces
+================================================================================
+
+block { if (X > 0) { block { Y := X; Y } } else { 0 } }
+
+---
+
+(source_file
+  (block_expression
+    (braced_block
+      (if_expression
+        condition: (comparison_expression
+          left: (identifier)
+          right: (integer_literal))
+        (braced_block
+          (block_expression
+            (braced_block
+              (assignment_expression
+                left: (identifier)
+                right: (identifier))
+              (identifier))))
+        (braced_block
+          (integer_literal))))))
+
+================================================================================
+Mixed brace and indent
+================================================================================
+
+C := class {
+    F():int = block:
+        42
 }
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (declaration
-        lhs: (identifier)
-        rhs: (logic_literal))
-      (declaration
-        lhs: (identifier)
-        type_hint: (identifier)
-        rhs: (integer)))))
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (block_expression
+            (indented_block
+              (integer_literal))))))))
 
-===============================
-Macro call parameters
-===============================
+================================================================================
+Braced block as function body
+================================================================================
 
-class (supertype, interface) {}
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
-      (identifier)
-      (identifier))
-    (block)))
-
-===============================
-Macro call parameters (indented block)
-===============================
-
-class (supertype, interface):
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
-      (identifier)
-      (identifier))
-    (block)))
-
-===============================
-Basic curly block
-===============================
-
-block {
-  0
-  1; 2
-  3
+F():int = {
+    X := 10
+    Y := 20
+    X + Y
 }
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (integer)
-      (integer)
-      (integer))))
+  (function_definition
+    signature: (call_expression
+      function: (identifier))
+    return_type: (identifier)
+    body: (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (binary_expression
+        left: (identifier)
+        right: (identifier)))))
 
-===============================
-Nested curly block
-===============================
+================================================================================
+Empty braced blocks
+================================================================================
 
-block {
-  1
-
-  block {
-    block {
-      2
-    }
-  }
-
-  3
-}
+block {}
+C := class {}
+F():void = {}
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (macro_call
-        macro: (identifier)
-        (block
-          (macro_call
-            macro: (identifier)
-            (block
-              (integer)))))
-      (integer))))
+  (block_expression
+    (braced_block))
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block)))
+  (function_definition
+    signature: (call_expression
+      function: (identifier))
+    return_type: (identifier)
+    body: (braced_block)))
 
-===============================
-Basic indent block
-===============================
+================================================================================
+Dot block in various positions
+================================================================================
+
+if (X). Print(X)
+loop. DoWork()
+block. X + Y
+
+---
+
+(source_file
+  (call_expression
+    function: (if_expression
+      condition: (identifier)
+      (dot_block
+        (identifier)))
+    arguments: (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    function: (loop_expression
+      (dot_block
+        (identifier))))
+  (binary_expression
+    left: (block_expression
+      (dot_block
+        (identifier)))
+    right: (identifier)))
+
+================================================================================
+Archetype inside braced block
+================================================================================
+
+block { P := Point{X := 10, Y := 20}; P }
+
+---
+
+(source_file
+  (block_expression
+    (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (archetype_instantiation
+          type: (identifier)
+          (assignment_expression
+            left: (identifier)
+            right: (integer_literal))
+          (assignment_expression
+            left: (identifier)
+            right: (integer_literal))))
+      (identifier))))
+
+================================================================================
+Braced class body with multiple members
+================================================================================
+
+C := class { X:int; var Y:float = 0.0; F():int = X; G():void = {} }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))
+        (var_definition
+          name: (identifier)
+          type: (identifier)
+          value: (float_literal))
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (identifier))
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (braced_block))))))
+
+================================================================================
+Spawn in indent block
+================================================================================
 
 block:
-  0
-  1; 2
-  3
+    spawn:
+        AsyncWork()
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (integer)
-      (integer)
-      (integer))))
+  (block_expression
+    (indented_block
+      (spawn_expression
+        (indented_block
+          (call_expression
+            function: (identifier)))))))
 
-===============================
-Basic indent block exit
-===============================
+================================================================================
+Indented class body
+================================================================================
+
+C := class:
+    X:int
+    Y:float = 0.0
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (float_literal))))))
+
+================================================================================
+Indented if-else
+================================================================================
+
+if (X > 0):
+    Print(X)
+else:
+    Print(0)
+
+---
+
+(source_file
+  (if_expression
+    condition: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))
+    (indented_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))
+    (indented_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (integer_literal)))))))
+
+================================================================================
+Indented block expression
+================================================================================
 
 block:
-  0
-  1
-2
+    X := 10
+    Y := 20
+    X + Y
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (integer)))
-  (integer))
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (binary_expression
+        left: (identifier)
+        right: (identifier)))))
 
-===============================
-Basic indent block exit with Tab
-===============================
+================================================================================
+Indented loop with break
+================================================================================
 
-block:
-	0
-	1
-2
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (integer)))
-  (integer))
-
-===============================
-Nested indent block
-===============================
-
-block:
-  1
-
-  block:
-    block:
-      2
-
-  3
+loop:
+    DoWork()
+    if (Done?). break
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (macro_call
-        macro: (identifier)
-        (block
-          (macro_call
-            macro: (identifier)
-            (block
-              (integer)))))
-      (integer))))
+  (loop_expression
+    (indented_block
+      (call_expression
+        function: (identifier))
+      (if_expression
+        condition: (postfix_query
+          operand: (identifier))
+        (dot_block
+          (break_expression))))))
 
-===============================
-Nested indent block with Tab
-===============================
+================================================================================
+Indented for loop
+================================================================================
 
-block:
-	1
-
-	block:
-		block:
-			2
-
-	3
+for (Item : Items):
+    Process(Item)
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (integer)
-      (macro_call
-        macro: (identifier)
-        (block
-          (macro_call
-            macro: (identifier)
-            (block
-              (integer)))))
-      (integer))))
+  (for_expression
+    clauses: (type_annotation
+      value: (identifier)
+      type: (identifier))
+    (indented_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))))
 
-===============================
-Nested indent block exit
-===============================
+================================================================================
+Nested indented blocks
+================================================================================
 
-block:
-  block:
-    block:
-      1
-2
+C := class:
+    F():int = block:
+        X := 42
+        X
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block
-      (macro_call
-        macro: (identifier)
-        (block
-          (macro_call
-            macro: (identifier)
-            (block
-              (integer)))))))
-  (integer))
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (block_expression
+            (indented_block
+              (assignment_expression
+                left: (identifier)
+                right: (integer_literal))
+              (identifier))))))))
 
-===============================
-Empty paren block
-===============================
+================================================================================
+Indented spawn and sync
+================================================================================
 
-()
-
----
-
-(source_file
-  (unit))
-
-===============================
-Paren block with one value 
-===============================
-
-(1)
-(2;)
+spawn:
+    AsyncWork()
 
 ---
 
 (source_file
-  (integer)
-  (integer))
+  (spawn_expression
+    (indented_block
+      (call_expression
+        function: (identifier)))))
 
-===============================
-Paren block with various indents
-===============================
+================================================================================
+Indented defer
+================================================================================
 
-(1
-
-2;3
-4
-
-   5)
-
----
-
-(source_file
-  (integer)
-  (integer)
-  (integer)
-  (integer)
-  (integer))
-
-===============================
-Comma separated paren block
-===============================
-
-(1, 2, 3)
-(1, 2;, 3)
+defer:
+    Cleanup()
+    Log("done")
 
 ---
 
 (source_file
-  (comma_separated_group
-    (integer)
-    (integer)
-    (integer)))
-  (comma_separated_group
-    (integer)
-    (integer))
-    (ERROR)
-    (integer)))
+  (defer_expression
+    (indented_block
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (string)))))))
 
+================================================================================
+Indented module
+================================================================================
+
+M := module:
+    X:int = 42
+    F():int = X
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (module_expression
+      (indented_block
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (identifier))))))
+
+================================================================================
+Indented array literal
+================================================================================
+
+Items := array:
+    1
+    2
+    3
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (array_literal
+      (indented_block
+        (integer_literal)
+        (integer_literal)
+        (integer_literal)))))
+
+================================================================================
+Four-level indent: class > block > for > if with dedent back
+================================================================================
+
+C := class:
+    Process(Items:[]int):int = block:
+        var Total:int = 0
+        for (Item : Items):
+            if (Item > 0):
+                set Total += Item
+        Total
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (type_annotation
+                  value: (identifier)
+                  type: (array_type
+                    (identifier))))))
+          return_type: (identifier)
+          body: (block_expression
+            (indented_block
+              (var_definition
+                name: (identifier)
+                type: (identifier)
+                value: (integer_literal))
+              (for_expression
+                clauses: (type_annotation
+                  value: (identifier)
+                  type: (identifier))
+                (indented_block
+                  (if_expression
+                    condition: (comparison_expression
+                      left: (identifier)
+                      right: (integer_literal))
+                    (indented_block
+                      (set_expression
+                        target: (identifier)
+                        value: (identifier))))))
+              (identifier))))))))

@@ -1,0 +1,176 @@
+================================================================================
+Module with nested module
+================================================================================
+
+Outer := module { Inner := module { X:int = 1 } }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (module_expression
+      (braced_block
+        (assignment_expression
+          left: (identifier)
+          right: (module_expression
+            (braced_block
+              (comparison_expression
+                left: (type_annotation
+                  value: (identifier)
+                  type: (identifier))
+                right: (integer_literal)))))))))
+
+================================================================================
+Using with path
+================================================================================
+
+using { /Verse.org/Verse }
+
+---
+
+(source_file
+  (using_statement
+    (path_literal)))
+
+================================================================================
+Using with no space before brace
+================================================================================
+
+using{/Verse.org/Verse}
+
+---
+
+(source_file
+  (using_statement
+    (path_literal)))
+
+================================================================================
+Module with specifier on keyword
+================================================================================
+
+M := module<public> { X:int = 0 }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (module_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)))
+      (braced_block
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))))))
+
+================================================================================
+Struct with persistable
+================================================================================
+
+S := struct<persistable> { X:int = 0; Y:float = 0.0 }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (struct_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)))
+      (braced_block
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (float_literal))))))
+
+================================================================================
+Enum open
+================================================================================
+
+weapon := enum<open> { Sword; Bow; Staff }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (enum_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)))
+      (braced_block
+        (identifier)
+        (identifier)
+        (identifier)))))
+
+================================================================================
+Interface definition
+================================================================================
+
+drawable := interface { Render():void; GetBounds():tuple(float, float) }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (interface_expression
+      (braced_block
+        (type_annotation
+          value: (call_expression
+            function: (identifier))
+          type: (identifier))
+        (type_annotation
+          value: (call_expression
+            function: (identifier))
+          type: (tuple_expression
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+Using with path literal
+================================================================================
+
+using { /Verse.org/Verse }
+
+---
+
+(source_file
+  (using_statement
+    (path_literal)))
+
+================================================================================
+Using with multiple paths
+================================================================================
+
+using { /Verse.org/Verse, /Fortnite.com/Devices }
+
+---
+
+(source_file
+  (using_statement
+    (path_literal)
+    (path_literal)))
+
+================================================================================
+Using with identifier
+================================================================================
+
+using { MyModule }
+
+---
+
+(source_file
+  (using_statement
+    (identifier)))

@@ -1,0 +1,596 @@
+================================================================================
+Class with var, method, and constructor pattern
+================================================================================
+
+player := class:
+    Name:string
+    var Health:int = 100
+    var Score:int = 0
+    TakeDamage(Amount:int):void =
+        set Health -= Amount
+    IsAlive():logic = Health > 0
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))
+        (var_definition
+          name: (identifier)
+          type: (identifier)
+          value: (integer_literal))
+        (var_definition
+          name: (identifier)
+          type: (identifier)
+          value: (integer_literal))
+        (function_definition
+          signature: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (type_annotation
+                  value: (identifier)
+                  type: (identifier)))))
+          return_type: (identifier)
+          body: (block_indent
+            (set_expression
+              target: (identifier)
+              value: (identifier))))
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (comparison_expression
+            left: (identifier)
+            right: (integer_literal)))))))
+
+================================================================================
+Struct with defaults
+================================================================================
+
+color := struct:
+    R:int = 0
+    G:int = 0
+    B:int = 0
+    A:int = 255
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (struct_expression
+      (indented_block
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))))))
+
+================================================================================
+Class with inheritance and override
+================================================================================
+
+entity := class:
+    Name:string
+    Display():void = Print(Name)
+
+character := class(entity):
+    Health:int = 100
+    Display<override>():void = Print("{Name}: {Health}")
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (identifier))))))))
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      supertypes: (supertype_clause
+        (identifier))
+      (indented_block
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (integer_literal))
+        (function_definition
+          signature: (call_expression
+            function: (decorated_expression
+              operand: (identifier)
+              specifiers: (specifier_list
+                (specifier
+                  name: (identifier)))))
+          return_type: (identifier)
+          body: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (string
+                  (interpolation
+                    (identifier))
+                  (interpolation
+                    (identifier)))))))))))
+
+================================================================================
+For with multiple clauses and filter
+================================================================================
+
+for (Index -> Value : Array, Value > 0):
+    Print("{Index}: {Value}")
+
+---
+
+(source_file
+  (for_expression
+    clauses: (binary_expression
+      left: (identifier)
+      right: (type_annotation
+        value: (identifier)
+        type: (identifier)))
+    clauses: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))
+    (indented_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (string
+              (interpolation
+                (identifier))
+              (interpolation
+                (identifier)))))))))
+
+================================================================================
+Nested if-else chain
+================================================================================
+
+if (Score > 90):
+    "excellent"
+else if (Score > 70):
+    "good"
+else:
+    "needs work"
+
+---
+
+(source_file
+  (if_expression
+    condition: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))
+    (indented_block
+      (string))
+    (if_expression
+      condition: (comparison_expression
+        left: (identifier)
+        right: (integer_literal))
+      (indented_block
+        (string))
+      (indented_block
+        (string)))))
+
+================================================================================
+Complex archetype instantiation
+================================================================================
+
+Config := game_config:
+    MaxPlayers := 100
+    EnablePvP := true
+    SpawnPoint := vector3{X := 0.0, Y := 0.0, Z := 100.0}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (macro_block
+      head: (identifier)
+      body: (indented_block
+        (assignment_expression
+          left: (identifier)
+          right: (integer_literal))
+        (assignment_expression
+          left: (identifier)
+          right: (boolean_literal))
+        (assignment_expression
+          left: (identifier)
+          right: (archetype_instantiation
+            type: (identifier)
+            (assignment_expression
+              left: (identifier)
+              right: (float_literal))
+            (assignment_expression
+              left: (identifier)
+              right: (float_literal))
+            (assignment_expression
+              left: (identifier)
+              right: (float_literal))))))))
+
+================================================================================
+Loop with break and variable mutation
+================================================================================
+
+loop:
+    set Counter += 1
+    if (Counter >= 10). break
+    Process(Counter)
+
+---
+
+(source_file
+  (loop_expression
+    (indented_block
+      (set_expression
+        target: (identifier)
+        value: (integer_literal))
+      (if_expression
+        condition: (comparison_expression
+          left: (identifier)
+          right: (integer_literal))
+        (dot_block
+          (break_expression)))
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))))
+
+================================================================================
+Module with public members and nested types
+================================================================================
+
+GameSystems := module:
+    player_state<public> := enum:
+        Alive
+        Dead
+        Spectating
+    player<public> := class:
+        Name:string
+        State:player_state = player_state.Alive
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (module_expression
+      (indented_block
+        (assignment_expression
+          left: (decorated_expression
+            operand: (identifier)
+            specifiers: (specifier_list
+              (specifier
+                name: (identifier))))
+          right: (enum_expression
+            (indented_block
+              (identifier)
+              (identifier)
+              (identifier))))
+        (assignment_expression
+          left: (decorated_expression
+            operand: (identifier)
+            specifiers: (specifier_list
+              (specifier
+                name: (identifier))))
+          right: (class_expression
+            (indented_block
+              (type_annotation
+                value: (identifier)
+                type: (identifier))
+              (comparison_expression
+                left: (type_annotation
+                  value: (identifier)
+                  type: (identifier))
+                right: (member_expression
+                  object: (identifier)
+                  member: (identifier))))))))))
+
+================================================================================
+Using then class then function
+================================================================================
+
+using { /Verse.org/Verse }
+
+game_manager := class:
+    var Players:[]player = array{}
+
+    AddPlayer(P:player):void =
+        set Players += array{P}
+
+---
+
+(source_file
+  (using_statement
+    (path_literal))
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (var_definition
+          name: (identifier)
+          type: (array_type
+            (identifier))
+          value: (array_literal))
+        (function_definition
+          signature: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (type_annotation
+                  value: (identifier)
+                  type: (identifier)))))
+          return_type: (identifier)
+          body: (block_indent
+            (set_expression
+              target: (identifier)
+              value: (array_literal
+                (identifier)))))))))
+
+================================================================================
+Complex for expression with do block
+================================================================================
+
+Result := for (V : Values, V >= 10.0). Floor[V] * 2.0
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (binary_expression
+      left: (subscript_expression
+        object: (for_expression
+          clauses: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          clauses: (comparison_expression
+            left: (identifier)
+            right: (float_literal))
+          (dot_block
+            (identifier)))
+        arguments: (argument_list
+          (argument
+            (identifier))))
+      right: (float_literal))))
+
+================================================================================
+Chained method calls
+================================================================================
+
+Config.SetOption("key", "value").SetOption("other", "thing").Build()
+
+---
+
+(source_file
+  (call_expression
+    function: (member_expression
+      object: (call_expression
+        function: (member_expression
+          object: (call_expression
+            function: (member_expression
+              object: (identifier)
+              member: (identifier))
+            arguments: (argument_list
+              (argument
+                (string))
+              (argument
+                (string))))
+          member: (identifier))
+        arguments: (argument_list
+          (argument
+            (string))
+          (argument
+            (string))))
+      member: (identifier))))
+
+================================================================================
+Spawn with task assignment
+================================================================================
+
+T := spawn:
+    Sleep(1.0)
+    Print("done")
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (spawn_expression
+      (indented_block
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (argument
+              (float_literal))))
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (argument
+              (string))))))))
+
+================================================================================
+Nested string interpolation
+================================================================================
+
+Message := "Player {Player.Name} scored {Player.Score} on {MapName}"
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (string
+      (interpolation
+        (member_expression
+          object: (identifier)
+          member: (identifier)))
+      (interpolation
+        (member_expression
+          object: (identifier)
+          member: (identifier)))
+      (interpolation
+        (identifier)))))
+
+================================================================================
+Where clause with type constraint
+================================================================================
+
+Max(A:t, B:t where t:comparable):t = if (A >= B) then A else B
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))
+        (argument
+          (binary_expression
+            left: (type_annotation
+              value: (identifier)
+              type: (identifier))
+            right: (type_annotation
+              value: (identifier)
+              type: (identifier))))))
+    return_type: (identifier)
+    body: (if_expression
+      condition: (comparison_expression
+        left: (identifier)
+        right: (identifier))
+      then: (identifier)
+      else: (identifier))))
+
+================================================================================
+Case with enum member patterns
+================================================================================
+
+case (State):
+    game_state.MainMenu => HandleMenu()
+    game_state.Playing => HandleGameplay()
+    game_state.Paused => HandlePause()
+    _ => HandleDefault()
+
+---
+
+(source_file
+  (case_expression
+    value: (identifier)
+    (indented_block
+      (binary_expression
+        left: (member_expression
+          object: (identifier)
+          member: (identifier))
+        right: (call_expression
+          function: (identifier)))
+      (binary_expression
+        left: (member_expression
+          object: (identifier)
+          member: (identifier))
+        right: (call_expression
+          function: (identifier)))
+      (binary_expression
+        left: (member_expression
+          object: (identifier)
+          member: (identifier))
+        right: (call_expression
+          function: (identifier)))
+      (binary_expression
+        left: (identifier)
+        right: (call_expression
+          function: (identifier))))))
+
+================================================================================
+Compound set expressions
+================================================================================
+
+set Player.Health -= Damage
+set Inventory.Items += array{NewItem}
+set Score *= Multiplier
+
+---
+
+(source_file
+  (set_expression
+    target: (member_expression
+      object: (identifier)
+      member: (identifier))
+    value: (identifier))
+  (set_expression
+    target: (member_expression
+      object: (identifier)
+      member: (identifier))
+    value: (array_literal
+      (identifier)))
+  (set_expression
+    target: (identifier)
+    value: (identifier)))
+
+================================================================================
+Var with array and map types
+================================================================================
+
+var Items:[]game_item = array{}
+var Scores:[string]int = map{}
+var MaybePlayer:?player = false
+
+---
+
+(source_file
+  (var_definition
+    name: (identifier)
+    type: (array_type
+      (identifier))
+    value: (array_literal))
+  (var_definition
+    name: (identifier)
+    type: (map_type
+      (identifier)
+      (identifier))
+    value: (map_literal))
+  (var_definition
+    name: (identifier)
+    type: (optional_type
+      (identifier))
+    value: (boolean_literal)))

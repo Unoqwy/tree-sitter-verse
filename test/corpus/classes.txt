@@ -1,0 +1,181 @@
+================================================================================
+Empty class
+================================================================================
+
+C := class {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block))))
+
+================================================================================
+Class with fields
+================================================================================
+
+C := class { X:int; Y:float = 0.0 }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (float_literal))))))
+
+================================================================================
+Class with specifiers
+================================================================================
+
+C := class<abstract> {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier)))
+      (braced_block))))
+
+================================================================================
+Class with inheritance
+================================================================================
+
+Derived := class(Base) {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      supertypes: (supertype_clause
+        (identifier))
+      (braced_block))))
+
+================================================================================
+Class with interface
+================================================================================
+
+Button := class(Widget, Clickable) {}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      supertypes: (supertype_clause
+        (identifier)
+        (identifier))
+      (braced_block))))
+
+================================================================================
+Struct definition
+================================================================================
+
+Point := struct { X:float = 0.0; Y:float = 0.0 }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (struct_expression
+      (braced_block
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (float_literal))
+        (comparison_expression
+          left: (type_annotation
+            value: (identifier)
+            type: (identifier))
+          right: (float_literal))))))
+
+================================================================================
+Interface definition
+================================================================================
+
+Drawable := interface { Render():void }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (interface_expression
+      (braced_block
+        (type_annotation
+          value: (call_expression
+            function: (identifier))
+          type: (identifier))))))
+
+================================================================================
+Enum definition
+================================================================================
+
+Direction := enum { North; South; East; West }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (enum_expression
+      (braced_block
+        (identifier)
+        (identifier)
+        (identifier)
+        (identifier)))))
+
+================================================================================
+Module definition
+================================================================================
+
+MyModule := module { X:int }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (module_expression
+      (braced_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))))))
+
+================================================================================
+Class with method
+================================================================================
+
+C := class { F():int = 42 }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (integer_literal))))))

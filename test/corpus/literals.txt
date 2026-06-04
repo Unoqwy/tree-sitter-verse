@@ -1,123 +1,134 @@
-===============================
-Integer
-===============================
+================================================================================
+Integer literals - decimal
+================================================================================
 
+42
 0
-1000
+123456
 
 ---
 
 (source_file
-  (integer)
-  (integer))
+  (integer_literal)
+  (integer_literal)
+  (integer_literal))
 
-===============================
-Integer (hex form)
-===============================
+================================================================================
+Integer literals - hexadecimal
+================================================================================
 
-0xAF
-0x100
-
----
-
-(source_file
-  (integer)
-  (integer))
-
-===============================
-Integer suffix
-===============================
-
-0l
+0xDEADBEEF
+0xff
+0x0000000080000000
 
 ---
 
 (source_file
-  (integer
-    (number_suffix)))
+  (integer_literal)
+  (integer_literal)
+  (integer_literal))
 
-===============================
-Float
-===============================
+================================================================================
+Integer literals - binary
+================================================================================
 
-0.0
-10.000
-
----
-
-(source_file
-  (float)
-  (float))
-
-===============================
-Float exponent
-===============================
-
-0e0
-10e100
-10.0e100
+0b1010
+0b0
+0B11111111
 
 ---
 
 (source_file
-  (float)
-  (float)
-  (float))
+  (integer_literal)
+  (integer_literal)
+  (integer_literal))
 
-===============================
-Float suffix
-===============================
+================================================================================
+Integer literals - octal and unicode
+================================================================================
 
-0.0l
-0e0l
-0.0e0l
-
----
-
-(source_file
-  (float
-    (number_suffix))
-  (float
-    (number_suffix))
-  (float
-    (number_suffix)))
-
-===============================
-Basic path literal
-===============================
-
-/Github.com/Ghost
+0o77
+0o41
+0u1f600
 
 ---
 
 (source_file
+  (integer_literal)
+  (integer_literal)
+  (integer_literal))
+
+================================================================================
+Float literals - basic
+================================================================================
+
+3.14
+0.5
+123.456
+
+---
+
+(source_file
+  (float_literal)
+  (float_literal)
+  (float_literal))
+
+================================================================================
+Float literals - scientific notation
+================================================================================
+
+1.0e10
+2.5e-3
+1.0E+2
+
+---
+
+(source_file
+  (float_literal)
+  (float_literal)
+  (float_literal))
+
+================================================================================
+Boolean literals
+================================================================================
+
+true
+false
+
+---
+
+(source_file
+  (boolean_literal)
+  (boolean_literal))
+
+================================================================================
+Character literals
+================================================================================
+
+'a'
+'Z'
+'\n'
+'\t'
+
+---
+
+(source_file
+  (char_literal)
+  (char_literal)
+  (char_literal)
+  (char_literal))
+
+================================================================================
+Path literals
+================================================================================
+
+/Verse.org/Verse
+/Fortnite.com/Devices
+/UnrealEngine.com/Temporary/SpatialMath
+
+---
+
+(source_file
+  (path_literal)
+  (path_literal)
   (path_literal))
-
-===============================
-@ path literal
-===============================
-
-/Ghost@Github.com/Ghost
-
----
-
-(source_file
-  (path_literal))
-
-===============================
-Path qualifiers
-===============================
-
-(/Localhost:)Var
-(local:)Var
-
----
-
-(source_file
-  (identifier
-    (qualifier
-      (path_literal)))
-  (identifier
-    (qualifier
-      (identifier))))
-

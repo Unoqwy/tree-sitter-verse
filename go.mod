@@ -1,4 +1,4 @@
-module github.com/unoqwy/tree-sitter-verse
+module github.com/tree-sitter/tree-sitter-verse
 
 go 1.22
 

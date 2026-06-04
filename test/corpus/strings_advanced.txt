@@ -1,4 +1,72 @@
 ================================================================================
+String quote escaping
+================================================================================
+
+"\"Quoted\""
+
+---
+
+(source_file
+  (string
+    (escape_sequence)
+    (escape_sequence)))
+
+================================================================================
+Hash inside string (not a comment)
+================================================================================
+
+"Before #"
+"#"
+"# Start"
+"Before # After"
+
+---
+
+(source_file
+  (string)
+  (string)
+  (string)
+  (string))
+
+================================================================================
+String template with expression
+================================================================================
+
+"Before {1}"
+"{1}"
+"{1} Start"
+"Before {1} After"
+
+---
+
+(source_file
+  (string
+    (interpolation
+      (integer_literal)))
+  (string
+    (interpolation
+      (integer_literal)))
+  (string
+    (interpolation
+      (integer_literal)))
+  (string
+    (interpolation
+      (integer_literal))))
+
+================================================================================
+Escaped braces in strings
+================================================================================
+
+"Escaped \{1\} test"
+
+---
+
+(source_file
+  (string
+    (escape_sequence)
+    (escape_sequence)))
+
+================================================================================
 Empty string
 ================================================================================
 
@@ -10,96 +78,73 @@ Empty string
   (string))
 
 ================================================================================
-Simple string
+Character literal
 ================================================================================
 
-"Hello World"
+'a'
 
 ---
 
 (source_file
-  (string))
+  (char_literal))
 
 ================================================================================
-String with escape sequences
+Path literal
 ================================================================================
 
-"Line1\nLine2\t"
+/Github.com/Ghost
 
 ---
 
 (source_file
-  (string
-    (escape_sequence)
-    (escape_sequence)))
+  (path_literal))
 
 ================================================================================
-String interpolation
+Path literal with @ sign
 ================================================================================
 
-"Hello {Name}"
+/Ghost@Github.com/Ghost
 
 ---
 
 (source_file
-  (string
-    (interpolation
-      (identifier))))
+  (path_literal))
 
 ================================================================================
-String with expression interpolation
+Integer suffix
 ================================================================================
 
-"Value: {X + 1}"
+0l
 
 ---
 
 (source_file
-  (string
-    (interpolation
-      (binary_expression
-        left: (identifier)
-        right: (integer_literal)))))
+  (integer_literal))
 
 ================================================================================
-String assignment
+Float with exponent
 ================================================================================
 
-X := "hello world"
+0e0
+10e100
+10.0e100
 
 ---
 
 (source_file
-  (assignment_expression
-    left: (identifier)
-    right: (string)))
+  (integer_literal)
+  (integer_literal)
+  (float_literal))
 
 ================================================================================
-String in function call
+Float with suffix
 ================================================================================
 
-Print("hello")
+0.0f64
+3.14f64
 
 ---
 
 (source_file
-  (call_expression
-    function: (identifier)
-    arguments: (argument_list
-      (argument
-        (string)))))
-
-================================================================================
-Multiple interpolations
-================================================================================
-
-"{A} and {B}"
-
----
-
-(source_file
-  (string
-    (interpolation
-      (identifier))
-    (interpolation
-      (identifier))))
+  (float_literal)
+  (float_literal))

@@ -1,105 +1,94 @@
 ================================================================================
-Empty string
+Array type
 ================================================================================
 
-""
+X:[]int
 
 ---
 
 (source_file
-  (string))
+  (type_annotation
+    value: (identifier)
+    type: (array_type (identifier))))
 
 ================================================================================
-Simple string
+Optional type
 ================================================================================
 
-"Hello World"
+X:?int
 
 ---
 
 (source_file
-  (string))
+  (type_annotation
+    value: (identifier)
+    type: (optional_type (identifier))))
 
 ================================================================================
-String with escape sequences
+Map type
 ================================================================================
 
-"Line1\nLine2\t"
+X:[string]int
 
 ---
 
 (source_file
-  (string
-    (escape_sequence)
-    (escape_sequence)))
+  (type_annotation
+    value: (identifier)
+    type: (map_type (identifier) (identifier))))
 
 ================================================================================
-String interpolation
+Nested container types
 ================================================================================
 
-"Hello {Name}"
+X:[][]int
 
 ---
 
 (source_file
-  (string
-    (interpolation
-      (identifier))))
+  (type_annotation
+    value: (identifier)
+    type: (array_type (array_type (identifier)))))
 
 ================================================================================
-String with expression interpolation
+Optional array type
 ================================================================================
 
-"Value: {X + 1}"
+X:?[]int
 
 ---
 
 (source_file
-  (string
-    (interpolation
-      (binary_expression
-        left: (identifier)
-        right: (integer_literal)))))
+  (type_annotation
+    value: (identifier)
+    type: (optional_type (array_type (identifier)))))
 
 ================================================================================
-String assignment
+Tuple type
 ================================================================================
 
-X := "hello world"
+X:tuple(int, string)
 
 ---
 
 (source_file
-  (assignment_expression
-    left: (identifier)
-    right: (string)))
+  (type_annotation
+    value: (identifier)
+    type: (tuple_expression (identifier) (identifier))))
 
 ================================================================================
-String in function call
+Type prefix (unnamed parameter)
 ================================================================================
 
-Print("hello")
+F(:int):int = 42
 
 ---
 
 (source_file
-  (call_expression
-    function: (identifier)
-    arguments: (argument_list
-      (argument
-        (string)))))
-
-================================================================================
-Multiple interpolations
-================================================================================
-
-"{A} and {B}"
-
----
-
-(source_file
-  (string
-    (interpolation
-      (identifier))
-    (interpolation
-      (identifier))))
+  (function_definition
+    signature: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument (type_prefix (identifier)))))
+    return_type: (identifier)
+    body: (integer_literal)))

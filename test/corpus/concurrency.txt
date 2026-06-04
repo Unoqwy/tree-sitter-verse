@@ -1,0 +1,108 @@
+================================================================================
+Spawn with braced block
+================================================================================
+
+spawn { AsyncWork() }
+
+---
+
+(source_file
+  (spawn_expression
+    (braced_block
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Sync with multiple tasks
+================================================================================
+
+sync { Task1(); Task2(); Task3() }
+
+---
+
+(source_file
+  (sync_expression
+    (braced_block
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Branch expression
+================================================================================
+
+branch { Option1(); Option2() }
+
+---
+
+(source_file
+  (branch_expression
+    (braced_block
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Defer cleanup
+================================================================================
+
+defer { Cleanup() }
+
+---
+
+(source_file
+  (defer_expression
+    (braced_block
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Task type annotation
+================================================================================
+
+T := spawn { DoAsync() }
+T:task(void)
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (spawn_expression
+      (braced_block
+        (call_expression
+          function: (identifier)))))
+  (call_expression
+    function: (type_annotation
+      value: (identifier)
+      type: (identifier))
+    arguments: (argument_list
+      (argument
+        (identifier)))))
+
+================================================================================
+Suspends function definition
+================================================================================
+
+WaitAndDo()<suspends>:void = Sleep(1.0)
+
+---
+
+(source_file
+  (function_definition
+    signature: (decorated_expression
+      operand: (call_expression
+        function: (identifier))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))))
+    return_type: (identifier)
+    body: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (float_literal))))))

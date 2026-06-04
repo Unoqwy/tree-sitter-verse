@@ -1,0 +1,196 @@
+================================================================================
+Simple binding definition
+================================================================================
+
+X := 42
+Name := Alice
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal))
+  (assignment_expression
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Typed definition with value
+================================================================================
+
+X:int = 42
+
+---
+
+(source_file
+  (comparison_expression
+    left: (type_annotation
+      value: (identifier)
+      type: (identifier))
+    right: (integer_literal)))
+
+================================================================================
+Var definition
+================================================================================
+
+var Score:int = 0
+var Health:float = 100.0
+
+---
+
+(source_file
+  (var_definition
+    name: (identifier)
+    type: (identifier)
+    value: (integer_literal))
+  (var_definition
+    name: (identifier)
+    type: (identifier)
+    value: (float_literal)))
+
+================================================================================
+Var definition without initial value
+================================================================================
+
+var Count:int
+
+---
+
+(source_file
+  (var_definition
+    name: (identifier)
+    type: (identifier)))
+
+================================================================================
+Function definition - simple
+================================================================================
+
+Add(A:int, B:int):int = A + B
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))
+        (argument
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))))
+    return_type: (identifier)
+    body: (binary_expression
+      left: (identifier)
+      right: (identifier))))
+
+================================================================================
+Function definition - no params
+================================================================================
+
+GetValue():int = 42
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier))
+    return_type: (identifier)
+    body: (integer_literal)))
+
+================================================================================
+Function definition with effects
+================================================================================
+
+Process()<transacts><decides>:void = DoWork()
+
+---
+
+(source_file
+  (function_definition
+    signature: (decorated_expression
+      operand: (call_expression
+        function: (identifier))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))
+        (specifier
+          name: (identifier))))
+    return_type: (identifier)
+    body: (call_expression
+      function: (identifier))))
+
+================================================================================
+Function definition with specifiers (effects)
+================================================================================
+
+Run(X:int)<transacts>:void = Print(X)
+
+---
+
+(source_file
+  (function_definition
+    signature: (decorated_expression
+      operand: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (type_annotation
+              value: (identifier)
+              type: (identifier)))))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))))
+    return_type: (identifier)
+    body: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (identifier))))))
+
+================================================================================
+Function definition with multiple params
+================================================================================
+
+Log(Message:string, Level:int):void = Print(Message)
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))
+        (argument
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))))
+    return_type: (identifier)
+    body: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (identifier))))))
+
+================================================================================
+Abstract function (no body)
+================================================================================
+
+Method():void
+
+---
+
+(source_file
+  (type_annotation
+    value: (call_expression
+      function: (identifier))
+    type: (identifier)))

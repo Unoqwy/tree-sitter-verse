@@ -1,0 +1,126 @@
+================================================================================
+Failable subscript
+================================================================================
+
+if (Element := Array[0]) { Use(Element) }
+
+---
+
+(source_file
+  (if_expression
+    condition: (assignment_expression
+      left: (identifier)
+      right: (subscript_expression
+        object: (identifier)
+        arguments: (argument_list
+          (argument
+            (integer_literal)))))
+    (braced_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))))
+
+================================================================================
+Failable multiple conditions in if
+================================================================================
+
+if (X > 0 and Y > 0) { Both() }
+
+---
+
+(source_file
+  (if_expression
+    condition: (binary_expression
+      left: (comparison_expression
+        left: (identifier)
+        right: (integer_literal))
+      right: (comparison_expression
+        left: (identifier)
+        right: (integer_literal)))
+    (braced_block
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Postfix query on logic
+================================================================================
+
+IsReady?
+
+---
+
+(source_file
+  (postfix_query
+    operand: (identifier)))
+
+================================================================================
+Logic conversion
+================================================================================
+
+Result := logic{X = Y}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (archetype_instantiation
+      type: (identifier)
+      (comparison_expression
+        left: (identifier)
+        right: (identifier)))))
+
+================================================================================
+Option with value
+================================================================================
+
+MaybeValue := option{42}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (option_literal
+      (integer_literal))))
+
+================================================================================
+Empty option (false)
+================================================================================
+
+Nothing := option{}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (option_literal)))
+
+================================================================================
+Decides function
+================================================================================
+
+Validate(X:int)<decides>:void = X > 0
+
+---
+
+(source_file
+  (function_definition
+    signature: (decorated_expression
+      operand: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (type_annotation
+              value: (identifier)
+              type: (identifier)))))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))))
+    return_type: (identifier)
+    body: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))))

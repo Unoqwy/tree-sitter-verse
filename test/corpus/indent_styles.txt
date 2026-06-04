@@ -1,0 +1,206 @@
+================================================================================
+2-space indent
+================================================================================
+
+block:
+  X := 1
+  Y := 2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+4-space indent
+================================================================================
+
+block:
+    X := 1
+    Y := 2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+8-space indent
+================================================================================
+
+block:
+        X := 1
+        Y := 2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Tab indent
+================================================================================
+
+block:
+	X := 1
+	Y := 2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Nested tabs
+================================================================================
+
+block:
+	if (X):
+		Print(X)
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (if_expression
+        condition: (identifier)
+        (indented_block
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (identifier)))))))))
+
+================================================================================
+Mixed indent widths: 2 then 4
+================================================================================
+
+block:
+  if (X):
+    Print(X)
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (if_expression
+        condition: (identifier)
+        (indented_block
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (argument
+                (identifier)))))))))
+
+================================================================================
+1-space indent
+================================================================================
+
+block:
+ X := 1
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+3-space indent
+================================================================================
+
+block:
+   X := 1
+   Y := 2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Tab indent then dedent to top
+================================================================================
+
+block:
+	X := 1
+Y := 2
+
+---
+
+(source_file
+  (block_expression
+    (indented_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))))
+  (assignment_expression
+    left: (identifier)
+    right: (integer_literal)))
+
+================================================================================
+Nested different indent widths
+================================================================================
+
+C := class:
+  F():int = block:
+      X := 42
+      X
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (indented_block
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (block_expression
+            (indented_block
+              (assignment_expression
+                left: (identifier)
+                right: (integer_literal))
+              (identifier))))))))

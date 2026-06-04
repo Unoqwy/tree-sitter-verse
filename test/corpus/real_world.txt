@@ -1,0 +1,195 @@
+================================================================================
+Using with path and class
+================================================================================
+
+using { /Verse.org/Verse }
+C := class {}
+
+---
+
+(source_file
+  (using_statement
+    (path_literal))
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block))))
+
+================================================================================
+Enum with case
+================================================================================
+
+Direction := enum { North; South; East; West }
+case(Dir) { North => 1; South => 2 }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (enum_expression
+      (braced_block
+        (identifier)
+        (identifier)
+        (identifier)
+        (identifier))))
+  (case_expression
+    value: (identifier)
+    (braced_block
+      (binary_expression
+        left: (identifier)
+        right: (integer_literal))
+      (binary_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Class with method and field
+================================================================================
+
+player := class { Name:string; GetName():string = Name }
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (class_expression
+      (braced_block
+        (type_annotation
+          value: (identifier)
+          type: (identifier))
+        (function_definition
+          signature: (call_expression
+            function: (identifier))
+          return_type: (identifier)
+          body: (identifier))))))
+
+================================================================================
+Array operations
+================================================================================
+
+Items := array{1, 2, 3}
+First := Items[0]
+Count := Items.Length
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (array_literal
+      (integer_literal)
+      (integer_literal)
+      (integer_literal)))
+  (assignment_expression
+    left: (identifier)
+    right: (subscript_expression
+      object: (identifier)
+      arguments: (argument_list
+        (argument
+          (integer_literal)))))
+  (assignment_expression
+    left: (identifier)
+    right: (member_expression
+      object: (identifier)
+      member: (identifier))))
+
+================================================================================
+For loop with filter
+================================================================================
+
+for (Item : Items, Item > 0) { Process(Item) }
+
+---
+
+(source_file
+  (for_expression
+    clauses: (type_annotation
+      value: (identifier)
+      type: (identifier))
+    clauses: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))
+    (braced_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))))
+
+================================================================================
+Spawn and sync
+================================================================================
+
+spawn { AsyncWork() }
+sync { Task1(); Task2() }
+
+---
+
+(source_file
+  (spawn_expression
+    (braced_block
+      (call_expression
+        function: (identifier))))
+  (sync_expression
+    (braced_block
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Archetype with field assignments
+================================================================================
+
+Config := Settings{MaxPlayers := 10, GameMode := Default}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (archetype_instantiation
+      type: (identifier)
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (assignment_expression
+        left: (identifier)
+        right: (identifier)))))
+
+================================================================================
+Set mutation
+================================================================================
+
+set Health = 100
+set Score += 50
+
+---
+
+(source_file
+  (set_expression
+    target: (identifier)
+    value: (integer_literal))
+  (set_expression
+    target: (identifier)
+    value: (integer_literal)))
+
+================================================================================
+Option literal
+================================================================================
+
+MaybeValue := option{42}
+Empty := option{}
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (option_literal
+      (integer_literal)))
+  (assignment_expression
+    left: (identifier)
+    right: (option_literal)))

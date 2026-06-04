@@ -1,0 +1,170 @@
+================================================================================
+Function with multiple effects
+================================================================================
+
+Process()<transacts><decides>:void = DoWork()
+
+---
+
+(source_file
+  (function_definition
+    signature: (decorated_expression
+      operand: (call_expression
+        function: (identifier))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))
+        (specifier
+          name: (identifier))))
+    return_type: (identifier)
+    body: (call_expression
+      function: (identifier))))
+
+================================================================================
+Function with specifier on name
+================================================================================
+
+F<native>():void
+
+---
+
+(source_file
+  (type_annotation
+    value: (call_expression
+      function: (decorated_expression
+        operand: (identifier)
+        specifiers: (specifier_list
+          (specifier
+            name: (identifier)))))
+    type: (identifier)))
+
+================================================================================
+Function with where clause
+================================================================================
+
+Identity(X:t where t:type):t = X
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (binary_expression
+            left: (type_annotation
+              value: (identifier)
+              type: (identifier))
+            right: (type_annotation
+              value: (identifier)
+              type: (identifier))))))
+    return_type: (identifier)
+    body: (identifier)))
+
+================================================================================
+Extension method
+================================================================================
+
+(Value:int).Double():int = Value * 2
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (member_expression
+        object: (parenthesized_expression
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))
+        member: (identifier)))
+    return_type: (identifier)
+    body: (binary_expression
+      left: (identifier)
+      right: (integer_literal))))
+
+================================================================================
+Constructor
+================================================================================
+
+MakePlayer<constructor>(Name:string)<transacts> := player:
+    Name := Name
+
+---
+
+(source_file
+  (assignment_expression
+    left: (decorated_expression
+      operand: (call_expression
+        function: (decorated_expression
+          operand: (identifier)
+          specifiers: (specifier_list
+            (specifier
+              name: (identifier))))
+        arguments: (argument_list
+          (argument
+            (type_annotation
+              value: (identifier)
+              type: (identifier)))))
+      specifiers: (specifier_list
+        (specifier
+          name: (identifier))))
+    right: (macro_block
+      head: (identifier)
+      body: (indented_block
+        (assignment_expression
+          left: (identifier)
+          right: (identifier))))))
+
+================================================================================
+Operator definition with quoted identifier
+================================================================================
+
+prefix'-'(Operand:char):char = Operand
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (type_annotation
+            value: (identifier)
+            type: (identifier)))))
+    return_type: (identifier)
+    body: (identifier)))
+
+================================================================================
+Function body with braced block
+================================================================================
+
+F():void = {}
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier))
+    return_type: (identifier)
+    body: (braced_block)))
+
+================================================================================
+Function body on next line
+================================================================================
+
+F():int =
+    42
+
+---
+
+(source_file
+  (function_definition
+    signature: (call_expression
+      function: (identifier))
+    return_type: (identifier)
+    body: (block_indent
+      (integer_literal))))

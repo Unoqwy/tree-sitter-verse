@@ -1,173 +1,194 @@
-===============================
-'if' condition
-===============================
+================================================================================
+If expression - braced
+================================================================================
 
-if (100 > 0) {}
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
-      (binary_expression
-        lhs: (integer)
-        rhs: (integer)))
-    (block)))
-
-===============================
-'if' condition block
-===============================
-
-if (
-  100 > 0
-  50 > 10
-) {}
+if (X > 0) { Print(X) }
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
-      (binary_expression
-        lhs: (integer)
-        rhs: (integer))
-      (binary_expression
-        lhs: (integer)
-        rhs: (integer)))
-    (block)))
+  (if_expression
+    condition: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))
+    (braced_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))))
 
-===============================
-'else' branch
-===============================
+================================================================================
+If-else expression - braced
+================================================================================
 
-if {} else {}
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    (block))
-  (macro_call
-    (else_keyword)
-    (block)))
-
-==============================
-'else if' branch
-===============================
-
-if {
-} else if {}
+if (X > 0) { A } else { B }
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    (block))
-  (macro_call
-    (else_keyword)
-    macro: (identifier)
-    (block)))
-
-==============================
-'else if' branch with condition
-===============================
-
-if {
-} else if (1 > 0) {}
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    (block))
-  (macro_call
-    (else_keyword)
-    macro: (identifier)
-    arguments: (argument_list
-      (binary_expression
-        lhs: (integer)
-        rhs: (integer)))
-    (block)))
-
-==============================
-'else' multiline
-===============================
-
-if {}
-
-then {}
-
-else if {}
-
-else {}
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    (block))
-  (macro_call
-    macro: (identifier)
-    (block))
-  (macro_call
-    (else_keyword)
-    macro: (identifier)
-    (block))
-  (macro_call
-    (else_keyword)
-    (block)))
-
-===============================
-'case' matching
-===============================
-
-case(Number):
-  0 => '0'
-  1 =>
-    '1'
-  _ => {}
-
----
-
-(source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
+  (if_expression
+    condition: (comparison_expression
+      left: (identifier)
+      right: (integer_literal))
+    (braced_block
       (identifier))
-    (block
-      (fat_arrow_expression
-        lhs: (integer)
-        rhs: (char))
-      (fat_arrow_expression
-        lhs: (integer)
-        rhs: (block
-          (char)))
-      (fat_arrow_expression
-        lhs: (identifier)
-        rhs: (block)))))
+    (braced_block
+      (identifier))))
 
-===============================
-'for' loop iterate
-===============================
+================================================================================
+For expression - braced
+================================================================================
 
-for (Player:GetPlayer()) {}
+for (Item : Items) { Process(Item) }
 
 ---
 
 (source_file
-  (macro_call
-    macro: (identifier)
-    arguments: (argument_list
-      (declaration
-        lhs: (identifier)
-        type_hint: (function_call
-          function: (identifier)
-          arguments: (argument_list))))
-    (block)))
+  (for_expression
+    clauses: (type_annotation
+      value: (identifier)
+      type: (identifier))
+    (braced_block
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (argument
+            (identifier)))))))
 
+================================================================================
+Loop expression
+================================================================================
+
+loop { DoWork() }
+
+---
+
+(source_file
+  (loop_expression
+    (braced_block
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Case expression
+================================================================================
+
+case(Value) { A => 1; B => 2 }
+
+---
+
+(source_file
+  (case_expression
+    value: (identifier)
+    (braced_block
+      (binary_expression
+        left: (identifier)
+        right: (integer_literal))
+      (binary_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Block expression
+================================================================================
+
+block { X := 10; X + 1 }
+
+---
+
+(source_file
+  (block_expression
+    (braced_block
+      (assignment_expression
+        left: (identifier)
+        right: (integer_literal))
+      (binary_expression
+        left: (identifier)
+        right: (integer_literal)))))
+
+================================================================================
+Return expression
+================================================================================
+
+return(42)
+
+---
+
+(source_file
+  (return_expression
+    (parenthesized_expression
+      (integer_literal))))
+
+================================================================================
+Break and continue
+================================================================================
+
+break
+continue
+
+---
+
+(source_file
+  (break_expression)
+  (continue_expression))
+
+================================================================================
+Spawn expression
+================================================================================
+
+spawn { AsyncWork() }
+
+---
+
+(source_file
+  (spawn_expression
+    (braced_block
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Sync expression
+================================================================================
+
+sync { Task1(); Task2() }
+
+---
+
+(source_file
+  (sync_expression
+    (braced_block
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Branch expression
+================================================================================
+
+branch { Option1(); Option2() }
+
+---
+
+(source_file
+  (branch_expression
+    (braced_block
+      (call_expression
+        function: (identifier))
+      (call_expression
+        function: (identifier)))))
+
+================================================================================
+Defer expression
+================================================================================
+
+defer { Cleanup() }
+
+---
+
+(source_file
+  (defer_expression
+    (braced_block
+      (call_expression
+        function: (identifier)))))
