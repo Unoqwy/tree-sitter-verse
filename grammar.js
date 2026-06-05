@@ -18,10 +18,17 @@ const PREC = {
   RANGE: 7,      // ..  to  ->
   ADD: 8,
   MUL: 9,
-  PREFIX: 10,
-  CALL: 11,      // .  ()  []  {}  ?  ^
-  TYPE_ANN: 12,  // :  (type annotation)
-  FUNC_DEF: 13,  // function definition (: type = body after call)
+  PREFIX: 10,         // value/binding prefixes: + - not &, set, ref, live (looser than `:`)
+  // `:` type annotation. Looser than the type-construction operators below so a
+  // member/call/array/optional type groups into the `type` field:
+  //   x:a.b   => x:(a.b)    not (x:a).b   (e.g. `for (M:Plot.GetMembers())`)
+  //   x:[]t   => x:([]t)
+  // but still tighter than the binding prefixes above so `live Y:int` => live(Y:int).
+  TYPE_ANN_LOOSE: 11,
+  TYPE_PREFIX: 12,    // type-construction prefixes: ?T  []T  [K]V
+  CALL: 13,           // .  ()  []  {}  ?  ^
+  TYPE_ANN: 14,       // base for indented/dot/var block offsets, and type_prefix
+  FUNC_DEF: 15,       // function definition (: type = body after call)
 };
 
 export default grammar({
@@ -198,10 +205,10 @@ export default grammar({
       $.subscript_expression,
     ),
 
-    // Type constructors
-    array_type: $ => prec(PREC.PREFIX, seq('[', ']', $._expression)),
-    map_type: $ => prec(PREC.PREFIX, seq('[', $._expression, ']', $._expression)),
-    optional_type: $ => prec.right(PREC.PREFIX + 1, seq('?', $._expression)),
+    // Type constructors (bind tighter than the `:` annotation so they group into the type)
+    array_type: $ => prec(PREC.TYPE_PREFIX, seq('[', ']', $._expression)),
+    map_type: $ => prec(PREC.TYPE_PREFIX, seq('[', $._expression, ']', $._expression)),
+    optional_type: $ => prec.right(PREC.TYPE_PREFIX, seq('?', $._expression)),
 
     // :type, unnamed parameter, or bare : for a qualified prefix (super:)
     type_prefix: $ => prec.right(PREC.TYPE_ANN, seq(':', optional($._expression))),
@@ -217,6 +224,7 @@ export default grammar({
       $.macro_block,
       $.assignment_expression,
       $.comparison_expression,
+      $.arrow_block,
       $.binary_expression,
       $.type_annotation,
       $.unary_expression,
@@ -317,8 +325,10 @@ export default grammar({
       }));
     },
 
-    // x:T type annotation, also handles (path:) qualified prefix when type is empty
-    type_annotation: $ => prec.right(PREC.TYPE_ANN, seq(
+    // x:T type annotation, also handles (path:) qualified prefix when type is empty.
+    // Binds looser than CALL so member-path types group correctly: x:a.b => x:(a.b),
+    // not (x:a).b (which would mis-parse `for (M:Plot.GetMembers())`).
+    type_annotation: $ => prec.right(PREC.TYPE_ANN_LOOSE, seq(
       field('value', $._expression),
       ':',
       optional(field('type', $._expression)),
@@ -381,7 +391,9 @@ export default grammar({
     argument_list: $ => commaSep1($.argument),
 
     argument: $ => choice(
-      seq('?', field('name', $.identifier), ':=', field('value', $._expression)),
+      // Named argument `?Name := value`. Outranks the generic expression parse
+      // (which would otherwise read `?Name` as an optional_type) via dynamic prec.
+      prec.dynamic(20, seq('?', field('name', $.identifier), ':=', field('value', $._expression))),
       $._expression,
     ),
 
@@ -488,6 +500,18 @@ export default grammar({
       ')',
       $._body_block,
     ),
+
+    // `pattern => <indented block>`: a case arm (or lambda) whose body spans
+    // multiple lines, e.g.
+    //   _ =>
+    //     Log("x")
+    //     0.0
+    // The plain single-line `pattern => expr` form is a binary_expression.
+    arrow_block: $ => prec.dynamic(1, prec.right(PREC.DEF, seq(
+      field('pattern', $._expression),
+      '=>',
+      field('body', $.block_indent),
+    ))),
 
     block_expression: $ => seq('block', $._body_block),
 

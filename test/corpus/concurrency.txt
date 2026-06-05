@@ -76,13 +76,13 @@ T:task(void)
       (braced_block
         (call_expression
           function: (identifier)))))
-  (call_expression
-    function: (type_annotation
-      value: (identifier)
-      type: (identifier))
-    arguments: (argument_list
-      (argument
-        (identifier)))))
+  (type_annotation
+    value: (identifier)
+    type: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (argument
+          (identifier))))))
 
 ================================================================================
 Suspends function definition

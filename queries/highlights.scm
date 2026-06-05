@@ -129,10 +129,10 @@
 (function_definition
   return_type: (identifier) @type)
 
-; Array/map/optional type constructors
-(array_type "]" @type)
-(map_type "]" @type)
-(optional_type "?" @type)
+; Array/map/optional element types (brackets stay punctuation)
+(array_type (identifier) @type)
+(map_type (identifier) @type)
+(optional_type (identifier) @type)
 
 ; Builtin types
 ((identifier) @type.builtin
@@ -158,20 +158,6 @@
 ; Member access
 (member_expression
   member: (identifier) @property)
-
-; Specifiers / attributes
-(specifier
-  ["<" ">"] @attribute)
-(specifier
-  name: (identifier) @attribute)
-
-(annotation
-  name: (identifier) @attribute)
-
-(decorated_expression
-  specifiers: (specifier_list
-    (specifier
-      name: (identifier) @attribute)))
 
 ; Operators
 [
@@ -199,6 +185,21 @@
   "^"
   "@"
 ] @operator
+
+; Specifiers / attributes (after Operators so a specifier's `<` `>` win over the
+; comparison-operator rule, keeping `<public>` one coherent token)
+(specifier
+  ["<" ">"] @attribute)
+(specifier
+  name: (identifier) @attribute)
+
+(annotation
+  name: (identifier) @attribute)
+
+(decorated_expression
+  specifiers: (specifier_list
+    (specifier
+      name: (identifier) @attribute)))
 
 ; Punctuation
 ["(" ")" "[" "]" "{" "}"] @punctuation.bracket

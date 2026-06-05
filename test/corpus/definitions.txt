@@ -194,3 +194,21 @@ Method():void
     value: (call_expression
       function: (identifier))
     type: (identifier)))
+
+================================================================================
+Var typed with reserved-word type and no value
+================================================================================
+
+var Flag: logic
+var Handle: task = T
+
+---
+
+(source_file
+  (var_definition
+    name: (identifier)
+    type: (identifier))
+  (var_definition
+    name: (identifier)
+    type: (identifier)
+    value: (identifier)))

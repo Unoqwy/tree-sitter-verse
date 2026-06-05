@@ -23,6 +23,29 @@ if (Element := Array[0]) { Use(Element) }
             (identifier)))))))
 
 ================================================================================
+Failable subscript with named arguments
+================================================================================
+
+X := Cost.Purchase[?Plot := Plot, ?Agent := Instigator]
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (subscript_expression
+      object: (member_expression
+        object: (identifier)
+        member: (identifier))
+      arguments: (argument_list
+        (argument
+          name: (identifier)
+          value: (identifier))
+        (argument
+          name: (identifier)
+          value: (identifier))))))
+
+================================================================================
 Failable multiple conditions in if
 ================================================================================
 

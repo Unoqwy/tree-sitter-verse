@@ -346,12 +346,61 @@ Greet(?Name := Alice, ?Level := 5)
     function: (identifier)
     arguments: (argument_list
       (argument
-        (assignment_expression
-          left: (optional_type
-            (identifier))
-          right: (identifier)))
+        name: (identifier)
+        value: (identifier))
       (argument
-        (assignment_expression
-          left: (optional_type
-            (identifier))
-          right: (integer_literal))))))
+        name: (identifier)
+        value: (integer_literal)))))
+
+================================================================================
+Type annotation with member-path type
+================================================================================
+
+X:a.b.C
+for (Member : Plot.GetMembers()) {}
+
+---
+
+(source_file
+  (type_annotation
+    value: (identifier)
+    type: (member_expression
+      object: (member_expression
+        object: (identifier)
+        member: (identifier))
+      member: (identifier)))
+  (for_expression
+    clauses: (type_annotation
+      value: (identifier)
+      type: (call_expression
+        function: (member_expression
+          object: (identifier)
+          member: (identifier))))
+    (braced_block)))
+
+================================================================================
+Case arm with multiline body
+================================================================================
+
+W := case(K):
+	_ =>
+		Log("x")
+		0.0
+
+---
+
+(source_file
+  (assignment_expression
+    left: (identifier)
+    right: (case_expression
+      value: (identifier)
+      (indented_block
+        (arrow_block
+          pattern: (identifier)
+          body: (block_indent
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (argument
+                  (string))))
+            (float_literal)))))))

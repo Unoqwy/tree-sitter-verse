@@ -266,6 +266,22 @@ static bool scan_newline_indent_dedent(Scanner *scanner, TSLexer *lexer, const b
 
     uint16_t cur = current_indent(scanner);
 
+    // Leading-dot method-chain continuation: a line that begins with `.Name`
+    // continues the previous expression as a member access, e.g.
+    //     Button()
+    //         .Bind(S)
+    //         .ApplySize(A, B)
+    // Suppress the separating NEWLINE/INDENT (return no token) so `.` glues onto
+    // the previous expression instead of starting a bogus nested block. Only when
+    // the dot line is at the same or deeper indent (never across a real dedent),
+    // and not a leading range operator `..`.
+    if (lexer->lookahead == '.' && indent_col >= cur) {
+        advance(lexer); // peek past the first '.'; mark_end above keeps the boundary
+        if (lexer->lookahead != '.') {
+            return false;
+        }
+    }
+
     // BRACE_SEP: inside a braced/paren body, a line beginning with `(` or `[`
     // is a new statement — NOT a postfix call/subscript on the previous line.
     // Emitting this separator forces the statement boundary so `f()` followed

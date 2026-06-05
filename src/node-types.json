@@ -16,6 +16,10 @@
         "named": true
       },
       {
+        "type": "arrow_block",
+        "named": true
+      },
+      {
         "type": "assignment_expression",
         "named": true
       },
@@ -398,6 +402,32 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "arrow_block",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block_indent",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

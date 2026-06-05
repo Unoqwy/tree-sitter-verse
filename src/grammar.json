@@ -142,7 +142,7 @@
     },
     "indented_block": {
       "type": "PREC",
-      "value": 14,
+      "value": 16,
       "content": {
         "type": "SEQ",
         "members": [
@@ -221,7 +221,7 @@
     },
     "dot_block": {
       "type": "PREC_RIGHT",
-      "value": 13,
+      "value": 15,
       "content": {
         "type": "SEQ",
         "members": [
@@ -262,7 +262,7 @@
       "value": 10,
       "content": {
         "type": "PREC_RIGHT",
-        "value": 13,
+        "value": 15,
         "content": {
           "type": "SEQ",
           "members": [
@@ -422,7 +422,7 @@
       "value": 10,
       "content": {
         "type": "PREC_RIGHT",
-        "value": 13,
+        "value": 15,
         "content": {
           "type": "CHOICE",
           "members": [
@@ -590,7 +590,7 @@
     },
     "array_type": {
       "type": "PREC",
-      "value": 10,
+      "value": 12,
       "content": {
         "type": "SEQ",
         "members": [
@@ -611,7 +611,7 @@
     },
     "map_type": {
       "type": "PREC",
-      "value": 10,
+      "value": 12,
       "content": {
         "type": "SEQ",
         "members": [
@@ -636,7 +636,7 @@
     },
     "optional_type": {
       "type": "PREC_RIGHT",
-      "value": 11,
+      "value": 12,
       "content": {
         "type": "SEQ",
         "members": [
@@ -653,7 +653,7 @@
     },
     "type_prefix": {
       "type": "PREC_RIGHT",
-      "value": 12,
+      "value": 14,
       "content": {
         "type": "SEQ",
         "members": [
@@ -707,6 +707,10 @@
         {
           "type": "SYMBOL",
           "name": "comparison_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "arrow_block"
         },
         {
           "type": "SYMBOL",
@@ -1682,7 +1686,7 @@
     },
     "type_annotation": {
       "type": "PREC_RIGHT",
-      "value": 12,
+      "value": 11,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1761,7 +1765,7 @@
     },
     "member_expression": {
       "type": "PREC_LEFT",
-      "value": 11,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1799,7 +1803,7 @@
     },
     "call_expression": {
       "type": "PREC_LEFT",
-      "value": 11,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1840,7 +1844,7 @@
     },
     "subscript_expression": {
       "type": "PREC_LEFT",
-      "value": 11,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1881,7 +1885,7 @@
     },
     "archetype_instantiation": {
       "type": "PREC_LEFT",
-      "value": 11,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1918,7 +1922,7 @@
     },
     "postfix_query": {
       "type": "PREC_LEFT",
-      "value": 11,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1939,7 +1943,7 @@
     },
     "postfix_deref": {
       "type": "PREC_LEFT",
-      "value": 11,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1960,7 +1964,7 @@
     },
     "qualified_access": {
       "type": "PREC_LEFT",
-      "value": 12,
+      "value": 14,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1988,7 +1992,7 @@
       "value": -1,
       "content": {
         "type": "PREC_LEFT",
-        "value": 13,
+        "value": 15,
         "content": {
           "type": "SEQ",
           "members": [
@@ -2041,33 +2045,37 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "?"
-            },
-            {
-              "type": "FIELD",
-              "name": "name",
-              "content": {
-                "type": "SYMBOL",
-                "name": "identifier"
+          "type": "PREC_DYNAMIC",
+          "value": 20,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "?"
+              },
+              {
+                "type": "FIELD",
+                "name": "name",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                }
+              },
+              {
+                "type": "STRING",
+                "value": ":="
+              },
+              {
+                "type": "FIELD",
+                "name": "value",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
               }
-            },
-            {
-              "type": "STRING",
-              "value": ":="
-            },
-            {
-              "type": "FIELD",
-              "name": "value",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_expression"
-              }
-            }
-          ]
+            ]
+          }
         },
         {
           "type": "SYMBOL",
@@ -2887,6 +2895,39 @@
         }
       ]
     },
+    "arrow_block": {
+      "type": "PREC_DYNAMIC",
+      "value": 1,
+      "content": {
+        "type": "PREC_RIGHT",
+        "value": 1,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "pattern",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_expression"
+              }
+            },
+            {
+              "type": "STRING",
+              "value": "=>"
+            },
+            {
+              "type": "FIELD",
+              "name": "body",
+              "content": {
+                "type": "SYMBOL",
+                "name": "block_indent"
+              }
+            }
+          ]
+        }
+      }
+    },
     "block_expression": {
       "type": "SEQ",
       "members": [
@@ -3301,7 +3342,7 @@
     },
     "specifier": {
       "type": "PREC",
-      "value": 13,
+      "value": 15,
       "content": {
         "type": "SEQ",
         "members": [
